@@ -183,6 +183,12 @@
   .cine-foot .cta{display:none;}
   .cine.ready .cine-next{display:none;}
   .cine.ready .cine-foot .cta{display:inline-block;}
+  .cine-skip{position:absolute;top:calc(9vh + 14px);right:16px;z-index:4;pointer-events:auto;cursor:pointer;
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:#9fb4c4;
+    background:rgba(11,22,38,.6);border:1px solid var(--panel-line);border-radius:10px;padding:7px 12px;
+    backdrop-filter:blur(6px);transition:.15s;}
+  .cine-skip:hover{color:var(--cyan);border-color:var(--cyan);}
+  .cine-skip:active{transform:translateY(1px);}
   /* rotate-to-landscape overlay */
   .rotate{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;
     background:radial-gradient(120% 90% at 50% 30%,rgba(20,40,72,.7),rgba(5,10,20,.96));
@@ -283,6 +289,7 @@
   <div class="cine-embers" id="cineEmbers"></div>
   <div class="cine-bar top"></div>
   <div class="cine-bar bottom"></div>
+  <button class="cine-skip" id="storySkip">GEÇ ⏩</button>
   <div class="cine-stage" id="cineStage">
     <div class="cine-chapter"><span class="rule"></span><span id="storyChapNo">BÖLÜM 1</span><span class="rule"></span></div>
     <div class="cine-portrait"><canvas id="storyPortrait" width="240" height="240"></canvas></div>
@@ -290,7 +297,7 @@
     <div class="cine-title" id="storyTitle">İlk Kıvılcım</div>
     <div class="cine-text" id="storyLine"></div>
     <div class="cine-foot">
-      <span class="cine-next" id="storyNext">▸ devam için dokun</span>
+      <span class="cine-next" id="storyNext">▸ dokun · uzun bas: geç</span>
       <button class="cta" id="storyGo">BAŞLA</button>
     </div>
   </div>
@@ -923,6 +930,9 @@ function fire(launch){
   shotTimer = 0; settleTimer = 0;
   predicted = [];
   sfxLaunch(launch.power);
+  // tell the player they can trigger the ability mid-air
+  const ab = PROJ_TYPES[t].ability;
+  if(ab){ const lab = ab==='explode'?'PATLAT':ab==='split'?'BÖL':'FIRLA'; setHint(`Nova havada — DOKUN (ya da BOŞLUK) → ${lab}`); }
   if(arsenal[selType]<=0) selType = firstAvailable();
   updateHUD();
 }
@@ -967,6 +977,7 @@ function endShot(){
   pouchLoaded = true;
   selType = firstAvailable();
   state = 'aim';
+  setHint(levelConfig().hint);
   updateHUD();
 }
 
@@ -1528,32 +1539,40 @@ function loop(now){
 }
 function tickFly(){
   shotTimer+=DT;
-  // gem pickup + offscreen cull
   for(let i=projs.length-1;i>=0;i--){
     const p=projs[i];
+    // gem pickup
     for(const gm of gems){
       if(gm.got) continue;
       if(Math.hypot(p.position.x-gm.x, p.position.y-gm.y) < 34){
         gm.got=true; addScore(300, gm.x, gm.y); spawnImpact({x:gm.x,y:gm.y},'#5be0e6',16); sfxGem();
       }
     }
-    if(p.position.y>VH+160 || p.position.x>VW+220 || p.position.x<-220){
+    // a bomb that comes to rest without being tapped detonates on its own,
+    // so a thrown bomb ALWAYS does something (never just sits or drifts away)
+    if(p.plugin.type==='bomb' && !p.plugin.used && shotTimer>350 && p.speed<0.8){
+      p.plugin.used=true;
+      explode(p.position.x, p.position.y, 175, 1.0, 6);
+      Composite.remove(world, p); projs.splice(i,1);
+      continue;
+    }
+    // offscreen cull — ANY side, including off the top (fixes the high lob
+    // that loitered above the screen and left the game hanging)
+    if(p.position.y>VH+160 || p.position.y<-1000 || p.position.x>VW+220 || p.position.x<-220){
       Composite.remove(world, p); projs.splice(i,1);
     }
   }
   if(coresLeft<=0) return; // win already scheduled
-  // No active projectiles (e.g. bomb consumed itself, or all flew off) —
-  // let the explosion debris settle briefly, then reload. This is the fix
-  // for the game freezing in 'fly' after a bomb is detonated.
+  // No active projectiles left — let debris settle briefly, then reload/end.
   if(projs.length===0){
     settleTimer+=DT;
-    if(settleTimer>420 || shotTimer>7000) endShot();
+    if(settleTimer>360 || shotTimer>6000) endShot();
     return;
   }
   let anyMoving=false;
   for(const p of projs) if(p.speed>0.6) anyMoving=true;
   if(!anyMoving){ settleTimer+=DT; } else settleTimer=0;
-  if(settleTimer>520 || shotTimer>7000) endShot();
+  if(settleTimer>520 || shotTimer>6000) endShot();
 }
 requestAnimationFrame(loop);
 
@@ -1809,8 +1828,26 @@ function drawPortrait(){
   pctx.beginPath(); pctx.arc(0,r*0.42,r*0.22,0.15*Math.PI,0.85*Math.PI); pctx.stroke();
   pctx.restore();
 }
-el('cineStage').addEventListener('pointerdown', e=>{ if(e.target.closest('#storyGo')) return; advanceStory(); });
+/* tap = advance a line · long-press = skip the whole story (nobody must sit through it) */
+let lpTimer=null, lpFired=false, lpX=0, lpY=0;
+function onBtn(e){ return e.target.closest('#storyGo') || e.target.closest('#storySkip'); }
+el('cineStage').addEventListener('pointerdown', e=>{
+  if(onBtn(e)) return;
+  lpFired=false; lpX=e.clientX; lpY=e.clientY;
+  clearTimeout(lpTimer);
+  lpTimer=setTimeout(()=>{ lpFired=true; beginLevelFromStory(); }, 480);
+});
+el('cineStage').addEventListener('pointermove', e=>{
+  if(lpTimer && Math.hypot(e.clientX-lpX, e.clientY-lpY)>14){ clearTimeout(lpTimer); lpTimer=null; }
+});
+el('cineStage').addEventListener('pointerup', e=>{
+  clearTimeout(lpTimer); lpTimer=null;
+  if(lpFired || onBtn(e)) return;
+  advanceStory();
+});
+el('cineStage').addEventListener('pointercancel', ()=>{ clearTimeout(lpTimer); lpTimer=null; });
 el('storyGo').onclick=e=>{ e.stopPropagation(); beginLevelFromStory(); };
+el('storySkip').onclick=e=>{ e.stopPropagation(); beginLevelFromStory(); };
 function startLevel(i, skipStory){
   arena=false;
   hideAllScrims();
