@@ -134,11 +134,55 @@
   .lcell .lstars{font-size:12px;color:#ffce5a;letter-spacing:2px;margin-top:4px;}
   .lcell .lbest{font-family:'JetBrains Mono',monospace;font-size:10px;color:#8fb;opacity:.8;margin-top:2px;}
 
-  /* story overlay */
-  .story-body{font-size:14px;line-height:1.65;color:#c4d2de;margin:14px auto 20px;max-width:380px;text-align:left;}
-  .story-body p{margin:0 0 10px;}
-  .story-body .atlas{color:#bfe9ec;font-style:italic;border-left:2px solid var(--panel-line);padding-left:10px;}
-  .story-body .clue{color:#ffce8a;font-style:italic;}
+  /* story — cinematic interstitial */
+  .cine{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;
+    overflow:hidden;opacity:0;transition:opacity .5s ease;
+    background:radial-gradient(130% 100% at 50% 12%,#243a66 0%,#16213f 38%,#0a1020 78%,#05080f 100%);}
+  .cine.show{display:flex;opacity:1;}
+  .cine-bar{position:absolute;left:0;right:0;height:9vh;background:#04070d;z-index:2;transform:translateY(0);
+    transition:transform .55s cubic-bezier(.2,.8,.2,1);}
+  .cine-bar.top{top:0;border-bottom:1px solid rgba(91,224,230,.14);}
+  .cine-bar.bottom{bottom:0;border-top:1px solid rgba(91,224,230,.14);}
+  .cine:not(.show) .cine-bar.top{transform:translateY(-100%);}
+  .cine:not(.show) .cine-bar.bottom{transform:translateY(100%);}
+  .cine-embers{position:absolute;inset:0;z-index:1;pointer-events:none;}
+  .ember{position:absolute;bottom:-12px;width:4px;height:4px;border-radius:50%;
+    background:radial-gradient(circle,#ffe7a3,#ff9d2f);box-shadow:0 0 8px rgba(255,180,80,.8);
+    opacity:0;animation:rise linear infinite;}
+  @keyframes rise{
+    0%{transform:translateY(0) translateX(0) scale(1);opacity:0;}
+    12%{opacity:.9;} 80%{opacity:.7;}
+    100%{transform:translateY(-86vh) translateX(var(--dx,20px)) scale(.3);opacity:0;}}
+  .cine-stage{position:relative;z-index:3;width:min(560px,90vw);padding:0 22px;text-align:center;
+    display:flex;flex-direction:column;align-items:center;}
+  .cine-chapter{display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;
+    font-size:11px;letter-spacing:5px;color:var(--cyan);text-transform:uppercase;opacity:.9;margin-bottom:18px;}
+  .cine-chapter .rule{width:46px;height:1px;background:linear-gradient(90deg,transparent,rgba(91,224,230,.6));}
+  .cine-chapter .rule:last-child{transform:scaleX(-1);}
+  .cine-portrait{width:118px;height:118px;margin-bottom:6px;
+    filter:drop-shadow(0 10px 30px rgba(255,170,80,.28));animation:floaty 4.5s ease-in-out infinite;}
+  .cine-portrait canvas{width:100%;height:100%;}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  .cine-place{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:3px;
+    color:#9fb4c4;text-transform:uppercase;margin-top:6px;}
+  .cine-title{font-size:clamp(30px,7vw,46px);font-weight:700;letter-spacing:.5px;line-height:1.05;margin:4px 0 18px;
+    background:linear-gradient(180deg,#ffffff,#cdeef2 60%,#7fd0d6);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 6px 40px rgba(91,224,230,.18);}
+  .cine-text{font-size:clamp(15px,2.4vw,18px);line-height:1.75;color:#dbe6ef;max-width:480px;min-height:5.2em;
+    font-weight:400;letter-spacing:.2px;}
+  .cine-text .spk{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;
+    color:var(--amber);text-transform:uppercase;margin-bottom:8px;}
+  .cine-text .ty{border-right:2px solid rgba(91,224,230,.0);}
+  .cine-text.typing .ty{border-right-color:rgba(91,224,230,.7);animation:caret .7s step-end infinite;}
+  @keyframes caret{50%{border-right-color:transparent;}}
+  .cine-foot{margin-top:26px;height:54px;display:flex;align-items:center;justify-content:center;}
+  .cine-next{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;color:#7f93a4;
+    animation:nudge 1.6s ease-in-out infinite;}
+  @keyframes nudge{0%,100%{opacity:.45;transform:translateX(0)}50%{opacity:1;transform:translateX(4px)}}
+  .cine-foot .cta{display:none;}
+  .cine.ready .cine-next{display:none;}
+  .cine.ready .cine-foot .cta{display:inline-block;}
   /* rotate-to-landscape overlay */
   .rotate{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;
     background:radial-gradient(120% 90% at 50% 30%,rgba(20,40,72,.7),rgba(5,10,20,.96));
@@ -234,13 +278,21 @@
   </div>
 </div>
 
-<!-- Story / chapter overlay -->
-<div class="scrim" id="storyScrim">
-  <div class="card">
-    <div class="eyebrow" id="storyEyebrow">BÖLÜM 1</div>
-    <div class="title" id="storyTitle" style="font-size:28px">İlk Kıvılcım</div>
-    <div class="story-body" id="storyBody"></div>
-    <div class="cta-row"><button class="cta" id="storyGo">BAŞLA</button></div>
+<!-- Story / chapter — cinematic interstitial -->
+<div class="cine" id="storyScrim">
+  <div class="cine-embers" id="cineEmbers"></div>
+  <div class="cine-bar top"></div>
+  <div class="cine-bar bottom"></div>
+  <div class="cine-stage" id="cineStage">
+    <div class="cine-chapter"><span class="rule"></span><span id="storyChapNo">BÖLÜM 1</span><span class="rule"></span></div>
+    <div class="cine-portrait"><canvas id="storyPortrait" width="240" height="240"></canvas></div>
+    <div class="cine-place" id="storyPlace">Fenerci Kulesi</div>
+    <div class="cine-title" id="storyTitle">İlk Kıvılcım</div>
+    <div class="cine-text" id="storyLine"></div>
+    <div class="cine-foot">
+      <span class="cine-next" id="storyNext">▸ devam için dokun</span>
+      <button class="cta" id="storyGo">BAŞLA</button>
+    </div>
   </div>
 </div>
 
@@ -1648,19 +1700,114 @@ function win(){ shake=16; slowFactor=0.3; sfxWin(); setTimeout(()=>showEnd(true)
 function lose(){ sfxLose(); setTimeout(()=>showEnd(false), 400); }
 
 /* ---------- flow ---------- */
-function hideAllScrims(){ hideEnd(); el('startScrim').classList.remove('show'); el('lvlScrim').classList.remove('show'); el('storyScrim').classList.remove('show'); }
+function hideAllScrims(){ hideEnd(); el('startScrim').classList.remove('show'); el('lvlScrim').classList.remove('show'); el('storyScrim').classList.remove('show'); stopPortrait(); }
+/* ---- cinematic story interstitial ---- */
+let storyLines=[], storyIdx=0, typeTimer=null, typing=false, portraitRAF=0, embersBuilt=false;
+function parseStoryLine(t){
+  const m=t.match(/^([A-ZÇĞİÖŞÜ]{3,12}):\s*([\s\S]*)$/);
+  if(m) return { speaker:m[1], text:m[2].replace(/^[“"']|[”"']$/g,'') };
+  return { speaker:null, text:t };
+}
+function renderStory(instant){
+  const {speaker,text}=parseStoryLine(storyLines[storyIdx]);
+  const wrap=el('storyLine');
+  wrap.innerHTML=(speaker?`<span class="spk">${speaker}</span>`:'')+'<span class="ty"></span>';
+  const ty=wrap.querySelector('.ty');
+  clearInterval(typeTimer);
+  if(instant || reduceMotion){ ty.textContent=text; wrap.classList.remove('typing'); typing=false; storyReady(); return; }
+  wrap.classList.add('typing'); typing=true;
+  let pos=0;
+  typeTimer=setInterval(()=>{
+    pos++; ty.textContent=text.slice(0,pos);
+    if(pos>=text.length){ clearInterval(typeTimer); typing=false; wrap.classList.remove('typing'); storyReady(); }
+  }, 24);
+}
+function storyReady(){ if(storyIdx>=storyLines.length-1) el('storyScrim').classList.add('ready'); }
+function advanceStory(){
+  if(typing){ renderStory(true); return; }       // first tap finishes the line
+  if(storyIdx<storyLines.length-1){ storyIdx++; el('storyScrim').classList.remove('ready'); renderStory(false); }
+  else beginLevelFromStory();
+}
+function beginLevelFromStory(){
+  stopPortrait();
+  el('storyScrim').classList.remove('show');
+  loadLevel(); updateSolution(null);
+}
 function showStory(i){
   const st=levelStory(i);
-  el('storyEyebrow').textContent=`BÖLÜM ${i+1} · ${st.place}`;
+  el('storyChapNo').textContent=`BÖLÜM ${i+1}`;
+  el('storyPlace').textContent=st.place;
   el('storyTitle').textContent=st.title;
-  let body='';
-  if(i===0) body += STORY.prologue.map(p=>`<p>${p}</p>`).join('');
-  body += `<p class="atlas">${st.intro}</p>`;
-  el('storyBody').innerHTML=body;
-  el('storyGo').onclick=()=>{ el('storyScrim').classList.remove('show'); loadLevel(); updateSolution(null); };
+  storyLines = (i===0) ? STORY.prologue.concat([st.intro]) : [st.intro];
+  storyIdx=0;
+  el('storyScrim').classList.remove('ready');
+  buildEmbers(); startPortrait();
   el('storyScrim').classList.add('show');
   state='menu';
+  renderStory(false);
 }
+function buildEmbers(){
+  if(embersBuilt) return; embersBuilt=true;
+  const host=el('cineEmbers');
+  for(let k=0;k<14;k++){
+    const e=document.createElement('div'); e.className='ember';
+    e.style.left=(Math.random()*100)+'%';
+    e.style.setProperty('--dx',(Math.random()*60-30)+'px');
+    const dur=6+Math.random()*7;
+    e.style.animationDuration=dur+'s';
+    e.style.animationDelay=(-Math.random()*dur)+'s';
+    const sc=(0.6+Math.random()*1.4)*4; e.style.width=e.style.height=sc+'px';
+    host.appendChild(e);
+  }
+}
+/* live Nova portrait */
+const pcv=el('storyPortrait'), pctx=pcv.getContext('2d');
+let pT=0, pBlinkT=70, pBlink=0;
+function startPortrait(){ if(!portraitRAF) portraitLoop(); }
+function stopPortrait(){ if(portraitRAF){ cancelAnimationFrame(portraitRAF); portraitRAF=0; } }
+function portraitLoop(){
+  pT++; pBlinkT--;
+  if(pBlinkT<=0){ pBlink=Math.min(1,pBlink+0.34); if(pBlink>=1) pBlinkT=50+Math.random()*150; }
+  else if(pBlink>0) pBlink=Math.max(0,pBlink-0.34);
+  drawPortrait();
+  portraitRAF=requestAnimationFrame(portraitLoop);
+}
+function drawPortrait(){
+  const W=pcv.width,H=pcv.height; pctx.clearRect(0,0,W,H);
+  const r=60, bob=Math.sin(pT*0.05)*4;
+  pctx.save(); pctx.translate(W/2, H/2+8+bob);
+  let gl=pctx.createRadialGradient(0,0,2,0,0,r*2.3);
+  gl.addColorStop(0,'rgba(255,200,110,.5)'); gl.addColorStop(1,'rgba(255,180,80,0)');
+  pctx.fillStyle=gl; pctx.beginPath(); pctx.arc(0,0,r*2.3,0,7); pctx.fill();
+  const fl=1+Math.sin(pT*0.18)*0.12;
+  pctx.fillStyle='#fff4d6';
+  pctx.beginPath(); pctx.moveTo(-r*0.4,-r*0.7);
+  pctx.quadraticCurveTo(-r*0.16,-r*1.7*fl,0,-r*0.95);
+  pctx.quadraticCurveTo(r*0.2,-r*1.9*fl,r*0.3,-r*0.78);
+  pctx.quadraticCurveTo(r*0.5,-r*1.4*fl,r*0.5,-r*0.6); pctx.closePath(); pctx.fill();
+  let core=pctx.createRadialGradient(-r*0.3,-r*0.4,2,0,0,r*1.05);
+  core.addColorStop(0,'#fff4d6'); core.addColorStop(.55,'#ffd166'); core.addColorStop(1,'#f08a2a');
+  pctx.fillStyle=core; pctx.beginPath(); pctx.arc(0,0,r,0,7); pctx.fill();
+  pctx.strokeStyle='rgba(255,200,110,.9)'; pctx.lineWidth=2; pctx.stroke();
+  pctx.fillStyle='rgba(255,255,255,.55)'; pctx.beginPath(); pctx.ellipse(-r*0.34,-r*0.4,r*0.26,r*0.18,-0.6,0,7); pctx.fill();
+  const eyeY=-r*0.05, eyeDX=r*0.4, eyeR=r*0.32;
+  for(const s of [-1,1]){
+    pctx.fillStyle='#fff';
+    pctx.beginPath(); pctx.ellipse(s*eyeDX,eyeY,eyeR,eyeR*(1-pBlink*0.85),0,0,7); pctx.fill();
+    if(pBlink<0.7){
+      const pr=eyeR*0.5;
+      pctx.fillStyle='#16202e'; pctx.beginPath(); pctx.arc(s*eyeDX,eyeY+eyeR*0.1,pr,0,7); pctx.fill();
+      pctx.fillStyle='#fff'; pctx.beginPath(); pctx.arc(s*eyeDX-pr*0.3,eyeY-pr*0.2,pr*0.4,0,7); pctx.fill();
+    }
+  }
+  pctx.strokeStyle='rgba(20,16,12,.7)'; pctx.lineWidth=Math.max(2,r*0.1); pctx.lineCap='round';
+  for(const s of [-1,1]){ pctx.beginPath(); pctx.moveTo(s*eyeDX-eyeR*0.6,eyeY-eyeR*1.2); pctx.lineTo(s*eyeDX+eyeR*0.6,eyeY-eyeR*1.25); pctx.stroke(); }
+  pctx.strokeStyle='rgba(30,18,12,.8)'; pctx.lineWidth=Math.max(1.8,r*0.08);
+  pctx.beginPath(); pctx.arc(0,r*0.42,r*0.22,0.15*Math.PI,0.85*Math.PI); pctx.stroke();
+  pctx.restore();
+}
+el('cineStage').addEventListener('pointerdown', e=>{ if(e.target.closest('#storyGo')) return; advanceStory(); });
+el('storyGo').onclick=e=>{ e.stopPropagation(); beginLevelFromStory(); };
 function startLevel(i, skipStory){
   arena=false;
   hideAllScrims();
@@ -1704,6 +1851,7 @@ el('btnRestart').onclick=()=>{ hideEnd(); if(arena){ arenaWave=0; score=0; start
 el('btnMenu').onclick=()=>{ hideEnd(); openMenu(); };
 el('btnMute').onclick=()=>{ muted=!muted; el('btnMute').textContent=muted?'🔇':'🔊'; };
 window.addEventListener('keydown',e=>{
+  if(el('storyScrim').classList.contains('show')){ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); advanceStory(); } return; }
   if(e.key==='r'||e.key==='R'){ if(arena){arenaWave=0;score=0;startArenaWave();} else startLevel(level, true); }
   if(e.key==='Escape') openMenu();
   if(e.key==='m'||e.key==='M'){ muted=!muted; el('btnMute').textContent=muted?'🔇':'🔊'; }
