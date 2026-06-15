@@ -1155,11 +1155,22 @@ function drawSlingFront(){
   }
 }
 
+/* a small twinkling 4-point star — Nova's star-spark motif */
+function drawStarSpark(c,x,y,s,tw){
+  const a=0.55+0.45*tw, long=s*(0.85+0.35*tw), shrt=s*0.24;
+  c.save(); c.translate(x,y);
+  c.fillStyle=`rgba(255,236,170,${0.22*a})`;
+  c.beginPath(); c.arc(0,0,s*1.7,0,7); c.fill();
+  c.fillStyle=`rgba(255,246,214,${a})`;
+  c.beginPath(); c.moveTo(0,-long); c.lineTo(shrt,0); c.lineTo(0,long); c.lineTo(-shrt,0); c.closePath(); c.fill();
+  c.beginPath(); c.moveTo(-long,0); c.lineTo(0,shrt); c.lineTo(long,0); c.lineTo(0,-shrt); c.closePath(); c.fill();
+  c.restore();
+}
 /* ----------------------------------------------------------
    NOVA — the mascot. Every projectile IS Nova: an expressive
    spark-creature with eyes, brows, mouth, squash & stretch,
-   eye-tracking and a flickering flame crest. The whole game is
-   built around this character. mood: 'idle'|'aim'|'fly'|'hit'
+   eye-tracking and a twinkling star-spark crest. The whole game
+   is built around this character. mood: 'idle'|'aim'|'fly'|'hit'
    ---------------------------------------------------------- */
 function drawNova(x,y,r,type,o){
   o=o||{};
@@ -1188,16 +1199,6 @@ function drawNova(x,y,r,type,o){
   ctx.save();
   ctx.rotate(moveAng); ctx.scale(1+stretch, 1-stretch*0.62); ctx.rotate(-moveAng);
 
-  /* flame crest (flickers) */
-  const fl = 1 + Math.sin(animT*0.6 + x)*0.16;
-  ctx.fillStyle = t.c1;
-  ctx.beginPath();
-  ctx.moveTo(-r*0.42, -r*0.72);
-  ctx.quadraticCurveTo(-r*0.20, -r*1.7*fl, 0, -r*0.95);
-  ctx.quadraticCurveTo(r*0.22, -r*1.9*fl, r*0.30, -r*0.78);
-  ctx.quadraticCurveTo(r*0.5, -r*1.4*fl, r*0.5, -r*0.6);
-  ctx.closePath(); ctx.fill();
-
   /* main orb */
   const core=ctx.createRadialGradient(-r*.32,-r*.4,1,0,0,r*1.05);
   core.addColorStop(0,t.c1); core.addColorStop(.55,t.c1); core.addColorStop(1,t.c2);
@@ -1207,6 +1208,12 @@ function drawNova(x,y,r,type,o){
   ctx.fillStyle='rgba(255,255,255,.55)';
   ctx.beginPath(); ctx.ellipse(-r*.34,-r*.4,r*.26,r*.18,-0.6,0,7); ctx.fill();
   ctx.restore();
+
+  /* star-spark above the head — Nova is the last spark of a fallen star */
+  if(type!=='bomb'){
+    const tw=0.5+0.5*Math.sin(animT*0.16 + x*0.1);
+    drawStarSpark(ctx, 0, -r*1.32, r*0.42, tw);
+  }
 
   /* ---- accessories per type (drawn upright) ---- */
   if(type==='heavy'){            // armor helmet band
@@ -1779,12 +1786,8 @@ function drawPortrait(){
   let gl=pctx.createRadialGradient(0,0,2,0,0,r*2.3);
   gl.addColorStop(0,'rgba(255,200,110,.5)'); gl.addColorStop(1,'rgba(255,180,80,0)');
   pctx.fillStyle=gl; pctx.beginPath(); pctx.arc(0,0,r*2.3,0,7); pctx.fill();
-  const fl=1+Math.sin(pT*0.18)*0.12;
-  pctx.fillStyle='#fff4d6';
-  pctx.beginPath(); pctx.moveTo(-r*0.4,-r*0.7);
-  pctx.quadraticCurveTo(-r*0.16,-r*1.7*fl,0,-r*0.95);
-  pctx.quadraticCurveTo(r*0.2,-r*1.9*fl,r*0.3,-r*0.78);
-  pctx.quadraticCurveTo(r*0.5,-r*1.4*fl,r*0.5,-r*0.6); pctx.closePath(); pctx.fill();
+  // twinkling star-spark above her head (Lyra's last spark)
+  drawStarSpark(pctx, 0, -r*1.28, r*0.5, 0.5+0.5*Math.sin(pT*0.12));
   let core=pctx.createRadialGradient(-r*0.3,-r*0.4,2,0,0,r*1.05);
   core.addColorStop(0,'#fff4d6'); core.addColorStop(.55,'#ffd166'); core.addColorStop(1,'#f08a2a');
   pctx.fillStyle=core; pctx.beginPath(); pctx.arc(0,0,r,0,7); pctx.fill();
