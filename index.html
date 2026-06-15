@@ -134,6 +134,25 @@
   .lcell .lstars{font-size:12px;color:#ffce5a;letter-spacing:2px;margin-top:4px;}
   .lcell .lbest{font-family:'JetBrains Mono',monospace;font-size:10px;color:#8fb;opacity:.8;margin-top:2px;}
 
+  /* rotate-to-landscape overlay */
+  .rotate{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;
+    background:radial-gradient(120% 90% at 50% 30%,rgba(20,40,72,.7),rgba(5,10,20,.96));
+    backdrop-filter:blur(4px);text-align:center;padding:24px;}
+  .rotate.show{display:flex;}
+  .rot-inner{max-width:320px;}
+  .phone{position:relative;width:130px;height:130px;margin:0 auto 22px;display:flex;align-items:center;justify-content:center;}
+  .phone-body{width:58px;height:104px;border:3px solid var(--cyan);border-radius:13px;
+    box-shadow:0 0 26px rgba(91,224,230,.45);background:rgba(11,22,38,.6);
+    display:flex;align-items:center;justify-content:center;animation:tilt 2.4s ease-in-out infinite;}
+  .phone-screen{width:42px;height:84px;border-radius:6px;
+    background:linear-gradient(160deg,#2f4a73,#e89a6a);opacity:.85;}
+  .rot-arrow{position:absolute;font-size:34px;color:var(--amber);
+    filter:drop-shadow(0 0 10px rgba(255,200,80,.5));animation:spin 2.4s ease-in-out infinite;}
+  @keyframes tilt{0%,40%{transform:rotate(0)}70%,100%{transform:rotate(-90deg)}}
+  @keyframes spin{0%,40%{transform:rotate(0);opacity:.5}70%,100%{transform:rotate(-90deg);opacity:1}}
+  .rot-title{font-size:22px;font-weight:700;letter-spacing:.5px;
+    background:linear-gradient(180deg,#fff,#bfe9ec);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .rot-sub{font-size:13px;line-height:1.6;color:#b8c8d6;margin:8px auto 20px;max-width:280px;}
   @media (max-width:560px){
     .solution{min-width:140px;}
     .title{font-size:30px;}
@@ -207,6 +226,19 @@
     <div class="scoresub" id="endScoreSub">PUAN</div>
     <div class="blurb" id="endBlurb"></div>
     <div class="cta-row" id="endButtons"></div>
+  </div>
+</div>
+
+<!-- Rotate-to-landscape suggestion (mobile portrait) -->
+<div class="rotate" id="rotate">
+  <div class="rot-inner">
+    <div class="phone" aria-hidden="true">
+      <div class="phone-body"><div class="phone-screen"></div></div>
+      <div class="rot-arrow">⟳</div>
+    </div>
+    <div class="rot-title">Telefonu yan çevir</div>
+    <div class="rot-sub">TRAJECTORY yatay oynanır — tüm yörüngeyi geniş ekranda gör. (Angry Birds gibi.)</div>
+    <button class="cta ghost" id="rotPlay">YİNE DE DİKEY OYNA</button>
   </div>
 </div>
 
@@ -1524,6 +1556,19 @@ window.addEventListener('keydown',e=>{
   if(e.key==='m'||e.key==='M'){ muted=!muted; el('btnMute').textContent=muted?'🔇':'🔊'; }
   if(e.key===' ' && state==='fly'){ triggerAbility(); }
 });
+
+/* ---------- rotate-to-landscape suggestion (mobile portrait) ---------- */
+let rotDismissed = false;
+const isTouch = window.matchMedia('(pointer: coarse)').matches || ('ontouchstart' in window);
+function updateOrientation(){
+  const portrait = window.innerHeight > window.innerWidth;
+  const show = isTouch && portrait && !rotDismissed;
+  el('rotate').classList.toggle('show', show);
+}
+el('rotPlay').onclick=()=>{ rotDismissed=true; el('rotate').classList.remove('show'); };
+window.addEventListener('resize', updateOrientation);
+window.addEventListener('orientationchange', ()=>setTimeout(updateOrientation,150));
+updateOrientation();
 
 })();
 </script>
