@@ -273,16 +273,31 @@ function resize(){
   const cssW = window.innerWidth, cssH = window.innerHeight;
   canvas.width = Math.round(cssW*dpr);
   canvas.height = Math.round(cssH*dpr);
+  // Fit the 1280-wide stage to the screen width; on tall (portrait) screens
+  // anchor the ground near the bottom and let the sky/ground bleed out to
+  // fill the whole viewport, so the game never looks boxed into a thin band.
   const base = Math.min(cssW/VW, cssH/VH);
+  const extra = cssH - VH*base;                 // vertical slack (css px)
+  const bottomPad = Math.min(extra, 96);        // reserve room for bottom HUD
   view = {
     dpr, cssW, cssH,
     scale: base*dpr,
     ox: (cssW - VW*base)*dpr/2,
-    oy: (cssH - VH*base)*dpr/2
+    oy: ((cssH - bottomPad) - VH*base)*dpr      // anchor world bottom toward screen bottom
   };
 }
 window.addEventListener('resize', resize);
 resize();
+
+// visible world rectangle (so backgrounds can be drawn edge-to-edge)
+function visBounds(){
+  return {
+    l:(0 - view.ox)/view.scale,
+    t:(0 - view.oy)/view.scale,
+    r:(canvas.width  - view.ox)/view.scale,
+    b:(canvas.height - view.oy)/view.scale
+  };
+}
 
 function toWorld(clientX, clientY){
   const r = canvas.getBoundingClientRect();
@@ -842,12 +857,16 @@ function roundRect(x,y,w,h,r){
 }
 
 function drawSky(){
-  const sky=ctx.createLinearGradient(0,0,0,GROUND_Y);
-  sky.addColorStop(0,'#16213f');
-  sky.addColorStop(.45,'#2f4a73');
-  sky.addColorStop(.78,'#7a6f8f');
+  const vb=visBounds();
+  const skyTop=Math.min(vb.t, 0)-60;
+  const left=Math.min(vb.l,0)-60, right=Math.max(vb.r,VW)+60, wWide=right-left;
+  const sky=ctx.createLinearGradient(0,skyTop,0,GROUND_Y);
+  sky.addColorStop(0,'#101a33');
+  sky.addColorStop(.30,'#16213f');
+  sky.addColorStop(.60,'#2f4a73');
+  sky.addColorStop(.84,'#7a6f8f');
   sky.addColorStop(1,'#e89a6a');
-  ctx.fillStyle=sky; ctx.fillRect(0,0,VW,GROUND_Y);
+  ctx.fillStyle=sky; ctx.fillRect(left,skyTop,wWide,GROUND_Y-skyTop);
   const sun=ctx.createRadialGradient(990,180,10,990,180,160);
   sun.addColorStop(0,'rgba(255,236,190,.95)');
   sun.addColorStop(.4,'rgba(255,196,130,.55)');
@@ -858,8 +877,8 @@ function drawSky(){
     ctx.fillStyle='rgba(255,235,220,.16)';
     cloud(c.x,c.y,c.s);
   }
-  hill(0.55,'#3a4f74', 0);
-  hill(0.85,'#33445f', 30);
+  hill(0.55,'#3a4f74', 0, left, right);
+  hill(0.85,'#33445f', 30, left, right);
 }
 function cloud(x,y,s){
   ctx.beginPath();
@@ -868,24 +887,27 @@ function cloud(x,y,s){
   ctx.ellipse(x-40*s,y+8*s,38*s,16*s,0,0,7);
   ctx.fill();
 }
-function hill(amp,color,off){
+function hill(amp,color,off,left,right){
   ctx.fillStyle=color;
   ctx.beginPath();
-  ctx.moveTo(0,GROUND_Y);
-  for(let x=0;x<=VW;x+=40){
+  ctx.moveTo(left,GROUND_Y);
+  for(let x=left;x<=right;x+=40){
     const y=GROUND_Y-120*amp - Math.sin((x+off)/220)*60*amp - Math.cos((x+off)/90)*16*amp;
     ctx.lineTo(x,y);
   }
-  ctx.lineTo(VW,GROUND_Y); ctx.closePath(); ctx.fill();
+  ctx.lineTo(right,GROUND_Y); ctx.closePath(); ctx.fill();
 }
 
 function drawGround(){
-  const grd=ctx.createLinearGradient(0,GROUND_Y,0,VH);
-  grd.addColorStop(0,'#3f7048'); grd.addColorStop(.18,'#2c5436'); grd.addColorStop(1,'#1c3826');
-  ctx.fillStyle=grd; ctx.fillRect(0,GROUND_Y,VW,VH-GROUND_Y);
-  ctx.fillStyle='#4f8a52'; ctx.fillRect(0,GROUND_Y-4,VW,8);
+  const vb=visBounds();
+  const left=Math.min(vb.l,0)-60, right=Math.max(vb.r,VW)+60, wWide=right-left;
+  const bottom=Math.max(vb.b, VH)+60;
+  const grd=ctx.createLinearGradient(0,GROUND_Y,0,bottom);
+  grd.addColorStop(0,'#3f7048'); grd.addColorStop(.18,'#2c5436'); grd.addColorStop(1,'#15291c');
+  ctx.fillStyle=grd; ctx.fillRect(left,GROUND_Y,wWide,bottom-GROUND_Y);
+  ctx.fillStyle='#4f8a52'; ctx.fillRect(left,GROUND_Y-4,wWide,8);
   ctx.fillStyle='rgba(120,200,130,.6)';
-  for(let x=0;x<VW;x+=14){ const h=4+Math.sin(x*.7)*3; ctx.fillRect(x,GROUND_Y-6-h,2.4,h); }
+  for(let x=left;x<right;x+=14){ const h=4+Math.sin(x*.7)*3; ctx.fillRect(x,GROUND_Y-6-h,2.4,h); }
   ctx.strokeStyle='rgba(91,224,230,.20)';
   ctx.fillStyle='rgba(180,230,236,.45)';
   ctx.font='10px "JetBrains Mono", monospace';
