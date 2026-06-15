@@ -1,6 +1,14 @@
-# TRAJECTORY — Nova’nın Balistik Macerası
+# TRAJECTORY: Son Kıvılcım
 
-Angry Birds tarzı, gerçek fizik tabanlı, **görsel doyum** ve **bir karakter (Nova)** üzerine kurulu bağımlılık yapan nişan oyunu. Tek dosya (`index.html`), bağımlılık yok (Matter.js CDN’den yüklenir).
+Gerçek fizik tabanlı, **görsel doyum** ve **karakter (Nova)** üzerine kurulu, **hikâyeli** ve **sonsuz** (Candy Crush gibi sürekli bölüm eklenen) bir balistik **hassasiyet bulmacası**. Tek dosya (`index.html`), bağımlılık yok (Matter.js CDN’den yüklenir).
+
+## Hikâye — "Son Kıvılcım"
+
+Güneş söndü; geriye sonsuz bir alacakaranlık kaldı. Gökyüzünü bir zamanlar iki ikiz yıldız aydınlatırdı: **Lyra** ve kardeşi **Sönük**. Lyra düşünce Sönük kederinden dondu ve dünyaya, ışığı hapseden **karanlık çekirdekler** ekti. Sen **Nova**’sın — Lyra’nın **son kıvılcımı**. Bekçi **Atlas** asırlık **Yıldız Sapanı**’nı senin için geriyor.
+
+- Her bölüm bir **anı/ipucu** açar; her karanlık çekirdeği kırınca hapsolmuş **ışık serbest kalır**.
+- İlerledikçe gökyüzü **alacakaranlıktan şafağa** döner — ama **tam şafak asla gelmez**: Nova ile Sönük her seferinde tam kavuşacakken araya yeni bir karanlık girer. Bu yüzden oyun **bitmez**; 10 elle yazılmış bölümden sonra **sonsuz, prosedürel** bölümlerle devam eder ve araya yeni hikâye parçaları girer.
+- Nova **son ışık** olduğu için her boşa atış onu soluklaştırır → **hassasiyet** ödüllendirilir (yıldız = az kıvılcımla çöz; "İLK ATIŞTA!" / "MÜKEMMEL").
 
 ## Karakter: NOVA
 

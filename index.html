@@ -134,6 +134,11 @@
   .lcell .lstars{font-size:12px;color:#ffce5a;letter-spacing:2px;margin-top:4px;}
   .lcell .lbest{font-family:'JetBrains Mono',monospace;font-size:10px;color:#8fb;opacity:.8;margin-top:2px;}
 
+  /* story overlay */
+  .story-body{font-size:14px;line-height:1.65;color:#c4d2de;margin:14px auto 20px;max-width:380px;text-align:left;}
+  .story-body p{margin:0 0 10px;}
+  .story-body .atlas{color:#bfe9ec;font-style:italic;border-left:2px solid var(--panel-line);padding-left:10px;}
+  .story-body .clue{color:#ffce8a;font-style:italic;}
   /* rotate-to-landscape overlay */
   .rotate{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;
     background:radial-gradient(120% 90% at 50% 30%,rgba(20,40,72,.7),rgba(5,10,20,.96));
@@ -196,9 +201,9 @@
 <!-- Start overlay -->
 <div class="scrim show" id="startScrim">
   <div class="card">
-    <div class="eyebrow">NOVA’NIN BALİSTİK MACERASI</div>
+    <div class="eyebrow">HESAPLA · NİŞANLA · ÇÖZ</div>
     <div class="title">TRAJECTORY</div>
-    <div class="blurb"><b>Nova</b>’yı sapana yerleştir, geri çek ve fırlat. Uçarken <b>ekrana dokun</b> — Nova kostüm değiştirir: bomba olur patlar, üçe bölünür, roket gibi fırlar. Açıyı, gücü, rüzgarı hesapla; zincirleme yık, kombo yap, skoru patlat.</div>
+    <div class="blurb">Her bölüm çözülebilir bir <b>balistik bulmaca</b>. Açıölçeri ve paneli oku — açı, güç, rüzgar — doğru mermiyi seç ve <b>tek zarif atışı</b> bul. Şans değil, <b>hesap</b> kazandırır. Kahramanın <b>Nova</b>: uçarken dokun, yeteneğini kullan.</div>
     <div class="legend">
       <span><i style="background:#c98a4b"></i>Ahşap</span>
       <span><i style="background:#7fd4e6"></i>Cam</span>
@@ -226,6 +231,16 @@
     <div class="scoresub" id="endScoreSub">PUAN</div>
     <div class="blurb" id="endBlurb"></div>
     <div class="cta-row" id="endButtons"></div>
+  </div>
+</div>
+
+<!-- Story / chapter overlay -->
+<div class="scrim" id="storyScrim">
+  <div class="card">
+    <div class="eyebrow" id="storyEyebrow">BÖLÜM 1</div>
+    <div class="title" id="storyTitle" style="font-size:28px">İlk Kıvılcım</div>
+    <div class="story-body" id="storyBody"></div>
+    <div class="cta-row"><button class="cta" id="storyGo">BAŞLA</button></div>
   </div>
 </div>
 
@@ -436,6 +451,58 @@ const LEVELS = [
 ];
 
 /* ============================================================
+   STORY — "Son Kıvılcım"  (endless / episodic; reunion ever-deferred)
+   ============================================================ */
+const STORY = {
+  prologue:[
+    'Güneş söneli çok oldu. Geriye sonsuz bir alacakaranlık kaldı.',
+    'Bir zamanlar gökyüzünü iki ikiz yıldız aydınlatırdı: sıcak ışık LYRA ve kardeşi, akşamın yıldızı SÖNÜK.',
+    'Lyra düştü. Sönük kederinden dondu; kimse bir daha ışığın ölüşünü görmesin diye dünyaya karanlık çekirdekler ekti.',
+    'Sen NOVA’sın — Lyra’nın son kıvılcımı. Bekçi ATLAS, asırlık Yıldız Sapanı’nı senin için geriyor.',
+    'Her çekirdeği tam isabetle kır, hapsolmuş ışığı serbest bırak. Ama unutma: sen son ışıksın — her boşa atış seni soluklaştırır.'
+  ],
+  levels:[
+    {title:'İlk Kıvılcım', place:'Fenerci Kulesi', intro:'ATLAS: “Korkma küçük ışık. Sapanı ben gereceğim; sen yalnızca doğru açıyı bul.”', clue:'Bir zamanlar gökte iki ışık vardı… biri hâlâ seni hatırlıyor.'},
+    {title:'Sessiz Sur', place:'Terk Edilmiş Sur', intro:'ATLAS: “Bu surları ikizler birlikte örmüştü. Şimdi yalnız gölgesi kaldı.”', clue:'Lyra ile Sönük ayrılmazdı — ta ki o geceye kadar.'},
+    {title:'Donan Göl', place:'Buz Gölü', intro:'ATLAS: “Buz ışığı hapseder ama incedir. Tek temiz vuruş yeter.”', clue:'Lyra düştüğünde göl bir gecede dondu.'},
+    {title:'Soğuk Sera', place:'Cam Seralar', intro:'ATLAS: “Burada ışık yetiştirirlerdi. Bombayı doğru yere koy, gerisini patlama halletsin.”', clue:'Sönük ışığı söndürmüyor — saklıyor. Bir daha kaybetmemek için.'},
+    {title:'Kırık Rasathane', place:'Cam Rasathane', intro:'ATLAS: “Yıldızları buradan izlerlerdi. Üçleme ile geniş camı süpür.”', clue:'Sönük bir zamanlar gökyüzünün en sıcak yarısıydı.'},
+    {title:'Rüzgârlı Yamaç', place:'Açık Yamaç', intro:'ATLAS: “Rüzgâr seni saptırır. Roketle dokun, hattını düzelt.”', clue:'Atlas gençken iki yıldızın da ışığını taşımıştı.'},
+    {title:'Barut Deposu', place:'Eski Cephanelik', intro:'ATLAS: “TNT zinciri… birini ateşle, gerisi kendiliğinden gider.”', clue:'Sönük’ün makineleri ışığı yakıt gibi yakıyor.'},
+    {title:'Soğuk Dökümhane', place:'Karanlık Dökümhane', intro:'ATLAS: “Metal kolay kırılmaz. Gülleyle ez ya da çevresini savur.”', clue:'Karanlığın kaynağı burada dövülüyor — bir kalbin etrafında.'},
+    {title:'Kale Avlusu', place:'Karanlık Kale — Avlu', intro:'ATLAS: “İki çekirdek, son eşik. Sakin ol, nefesini ayarla.”', clue:'Gerçek şu: Sönük seni söndürmeye değil, korumaya çalışıyordu.'},
+    {title:'Sönük’e Bir Adım', place:'Karanlık Kale — Taht', intro:'ATLAS: “İşte tahtın eşiği. Onu yok etme Nova… içindeki ışığı geri ver.”', clue:'Parmak uçlarınız değecekken karanlık yeniden yükseldi. Henüz değil…', cliff:true}
+  ],
+  // perpetual deferral — endless episodic content after the authored arc
+  endlessTitles:['Yeni Bir Gölge','Çatlayan Ufuk','Soğuk Geçit','Donan Köprü','Kayıp Fener','Uzak Bir Işık','Sönmeyen İz','Yankı'],
+  endlessPlaces:['Bilinmeyen Diyar','Gölge Geçidi','Kırık Köprü','Sisli Vadi','Unutulmuş Kule','Donmuş Liman','Karanlık Ova','Yıldız Harabesi'],
+  endlessIntros:[
+    'ATLAS: “Tam yaklaşmıştık ki yeni bir karanlık çöktü. Yine de pes yok.”',
+    'ATLAS: “Her engel bir bilmece. Hesapla, nişanla, çöz.”',
+    'ATLAS: “Sönük yine araya bir set çekti. Demek hâlâ seni istemiyor… ya da bırakamıyor.”',
+    'ATLAS: “Bir adım daha. Belki bu sefer, belki bir sonraki…”'
+  ],
+  endlessClues:[
+    'Kavuşmak bir adım daha uzaklaştı — ama ışık hâlâ yanıyor.',
+    'Her serbest kalan çekirdek ufku bir tını daha aydınlatıyor.',
+    'Sönük’ün koyduğu her engel, aslında bir “henüz gitme” demek.',
+    'Şafak yaklaşıyor… ama daha değil.'
+  ]
+};
+function levelStory(i){
+  if(i < STORY.levels.length) return STORY.levels[i];
+  const k = i - STORY.levels.length;
+  return {
+    title: STORY.endlessTitles[k % STORY.endlessTitles.length],
+    place: STORY.endlessPlaces[k % STORY.endlessPlaces.length],
+    intro: STORY.endlessIntros[k % STORY.endlessIntros.length],
+    clue:  STORY.endlessClues[k % STORY.endlessClues.length]
+  };
+}
+/* deterministic RNG so an endless level is the same puzzle each retry */
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+
+/* ============================================================
    SAVE (localStorage)
    ============================================================ */
 const SAVE_KEY = 'trajectory_save_v2';
@@ -468,6 +535,7 @@ let score = 0, comboCount = 0, comboTimer = 0;
 let pendingExplosions = [];
 let parallaxClouds = [];
 let animT = 0, blink = 0, blinkTimer = 90; // Nova facial animation
+let dawnT = 0; // 0=dusk … →1 sunrise (asymptotic; reunion never fully arrives)
 
 function buildEngine(){
   engine = Engine.create();
@@ -480,8 +548,50 @@ function buildEngine(){
   Composite.add(world, [ground, wallL, wallR]);
 }
 
+/* shared procedural structure generator (arena + endless campaign tail) */
+function genStructure(rng, diff){
+  const rnd=(a,b)=>a+rng()*(b-a);
+  const matsPool = diff<2?['wood','glass']:diff<4?['wood','glass','ice','stone']:['wood','glass','ice','stone','metal','tnt'];
+  const sblocks=[]; const cols = 2 + Math.min(3, Math.floor(diff/2));
+  const baseX = 760, gap = Math.min(150, 480/cols);
+  for(let c=0;c<cols;c++){
+    const x = baseX + c*gap + rnd(-10,10);
+    const stack = 1 + Math.floor(rnd(1, 2.4+diff*0.22));
+    let yTop = g;
+    for(let s=0;s<stack;s++){
+      const mat = matsPool[Math.floor(rng()*matsPool.length)];
+      const hh = mat==='tnt'?56: rnd(60,110);
+      const ww = mat==='tnt'?56: rnd(26,46);
+      yTop -= hh/2;
+      sblocks.push(blk(x, yTop, ww, hh, mat));
+      yTop -= hh/2 + 2;
+    }
+  }
+  const coreCount = 1 + Math.floor(diff/3);
+  const scores=[];
+  for(let i=0;i<coreCount;i++) scores.push({cx: baseX + rnd(0, cols*gap), cy: g - rnd(40, 120), w:40, h:50});
+  const ammoBudget = 3 + Math.floor(diff/2);
+  const ar = {orb: Math.max(1, ammoBudget-2)};
+  if(diff>=1) ar.bomb=1;
+  if(diff>=3) ar.split=1;
+  if(diff>=5) ar.heavy=1;
+  const sgems=[]; const gn=1+Math.floor(diff/2);
+  for(let i=0;i<gn;i++) sgems.push({x:rnd(560,1180), y:g-rnd(180,360)});
+  const totalA = Object.values(ar).reduce((a,b)=>a+b,0);
+  const par = Math.max(coreCount, Math.min(totalA-1, coreCount + Math.floor(diff/3)));
+  return { wind: diff>=2? (rng()*2-1)*0.0014 : 0, arsenal:ar, blocks:sblocks, cores:scores, gems:sgems, par };
+}
+/* campaign: authored levels, then infinite procedural episodes */
+function campaignLevel(i){
+  if(i < LEVELS.length) return LEVELS[i];
+  const diff = 4 + (i - LEVELS.length);
+  const s = genStructure(mulberry32(9001 + i*1337), diff);
+  return { name: levelStory(i).place, wind:s.wind, par:s.par, arsenal:s.arsenal,
+    blocks:s.blocks, cores:s.cores, gems:s.gems,
+    hint:'Yeni bir engel araya girdi. Paneli oku, doğru mermiyi seç, çekirdekleri kır.' };
+}
 function levelConfig(){
-  return arena ? arenaLevel(arenaWave) : LEVELS[level];
+  return arena ? arenaLevel(arenaWave) : campaignLevel(level);
 }
 
 function loadLevel(){
@@ -527,6 +637,9 @@ function loadLevel(){
     if(wind){ for(const p of projs) Body.applyForce(p, p.position, { x: wind*p.mass, y:0 }); }
   });
 
+  // the further you've come, the brighter the world — but never full sunrise
+  dawnT = arena ? 0.18 : (1 - 1/(1 + level*0.12));
+
   updateHUD();
   setHint(L.hint);
 }
@@ -541,41 +654,10 @@ function ammoLeft(){ return Object.values(arsenal).reduce((a,b)=>a+b,0); }
    ARENA (endless) generator
    ============================================================ */
 function arenaLevel(wave){
-  const rnd=(a,b)=>a+Math.random()*(b-a);
-  const matsPool = wave<2?['wood','glass']:wave<4?['wood','glass','ice','stone']:['wood','glass','ice','stone','metal','tnt'];
-  const blocks=[]; const cols = 2 + Math.min(3, Math.floor(wave/2));
-  const baseX = 760, gap = Math.min(150, 480/cols);
-  for(let c=0;c<cols;c++){
-    const x = baseX + c*gap + rnd(-10,10);
-    const stack = 1 + Math.floor(rnd(1, 2.4+wave*0.25));
-    let yTop = g;
-    for(let s=0;s<stack;s++){
-      const mat = matsPool[Math.floor(Math.random()*matsPool.length)];
-      const h = mat==='tnt'?56: rnd(60,110);
-      const w = mat==='tnt'?56: rnd(26,46);
-      yTop -= h/2;
-      blocks.push(blk(x, yTop, w, h, mat));
-      yTop -= h/2 + 2;
-    }
-  }
-  // a platform + core on top of a random column
-  const coreCount = 1 + Math.floor(wave/3);
-  const cores=[];
-  for(let i=0;i<coreCount;i++){
-    cores.push({cx: baseX + rnd(0, cols*gap), cy: g - rnd(40, 120), w:40, h:50});
-  }
-  const ammoBudget = 3 + Math.floor(wave/2);
-  const ar = {orb: Math.max(1, ammoBudget-2)};
-  if(wave>=1) ar.bomb=1;
-  if(wave>=3) ar.split=1;
-  if(wave>=5) ar.heavy=1;
-  const gemsArr=[]; const gn=1+Math.floor(wave/2);
-  for(let i=0;i<gn;i++) gemsArr.push({x:rnd(560,1180), y:g-rnd(180,360)});
-  return {
-    name:'Arena', wind: wave>=2? rnd(-1,1)*0.0014 : 0, par:99, arsenal:ar,
-    hint:`DALGA ${wave+1} · Tüm çekirdekleri imha et, dalga ilerlesin. Mühimmat biterse oyun biter.`,
-    blocks, cores, gems:gemsArr
-  };
+  const s=genStructure(Math.random, wave);
+  return { name:'Arena', wind:s.wind, par:99, arsenal:s.arsenal,
+    blocks:s.blocks, cores:s.cores, gems:s.gems,
+    hint:`DALGA ${wave+1} · Tüm çekirdekleri kır, dalga ilerlesin. Mühimmat biterse oyun biter.` };
 }
 
 /* ============================================================
@@ -611,7 +693,8 @@ function handleHit(target, other, rel, mid){
   if(co){
     if(rel > CORE.thr){
       co.hp -= 1 + Math.floor((rel-CORE.thr)/7);
-      spawnImpact(co.body.position, CORE.fill, 10);
+      if(other.plugin && other.plugin.kind==='proj') co._direct = true;
+      spawnImpact(co.body.position, '#b9a8ff', 10);
       shake = Math.min(shake + 6, 16);
       if(co.hp<=0) killCore(co);
     }
@@ -632,8 +715,13 @@ function killCore(co){
   if(co.dead) return;
   co.dead = true;
   Composite.remove(world, co.body);
-  spawnShards(co.body.position, CORE.fill, 28, co.w, co.h, true);
-  addScore(CORE.pts, co.body.position.x, co.body.position.y, true);
+  // released light: warm burst + soft shards (the freed spark)
+  const p=co.body.position;
+  spawnExplosion(p.x, p.y, 150);
+  spawnShards(p, '#ffe6a8', 26, co.w, co.h, true);
+  spawnText(p.x, p.y-24, 'IŞIK SERBEST', '#ffe6a8', true);
+  addScore(CORE.pts, p.x, p.y, true);
+  if(co._direct){ addScore(250, p.x, p.y+18); spawnText(p.x, p.y+14, 'TAM İSABET +250', '#5be0e6'); }
   shake = 16; slowFactor = 0.32;
   sfxCore();
   coresLeft--;
@@ -888,23 +976,34 @@ function roundRect(x,y,w,h,r){
   ctx.closePath();
 }
 
+function hexLerp(a,b,t){
+  const pa=parseInt(a.slice(1),16), pb=parseInt(b.slice(1),16);
+  const r=Math.round(((pa>>16)&255)+(((pb>>16)&255)-((pa>>16)&255))*t);
+  const gg=Math.round(((pa>>8)&255)+(((pb>>8)&255)-((pa>>8)&255))*t);
+  const bl=Math.round((pa&255)+((pb&255)-(pa&255))*t);
+  return `rgb(${r},${gg},${bl})`;
+}
 function drawSky(){
   const vb=visBounds();
   const skyTop=Math.min(vb.t, 0)-60;
   const left=Math.min(vb.l,0)-60, right=Math.max(vb.r,VW)+60, wWide=right-left;
+  const t=Math.max(0,Math.min(1,dawnT));
+  // dusk palette → dawn palette (relight)
   const sky=ctx.createLinearGradient(0,skyTop,0,GROUND_Y);
-  sky.addColorStop(0,'#101a33');
-  sky.addColorStop(.30,'#16213f');
-  sky.addColorStop(.60,'#2f4a73');
-  sky.addColorStop(.84,'#7a6f8f');
-  sky.addColorStop(1,'#e89a6a');
+  sky.addColorStop(0,   hexLerp('#101a33','#1d3566',t));
+  sky.addColorStop(.30, hexLerp('#16213f','#365f9e',t));
+  sky.addColorStop(.60, hexLerp('#2f4a73','#6f9fcf',t));
+  sky.addColorStop(.84, hexLerp('#7a6f8f','#e7b488',t));
+  sky.addColorStop(1,   hexLerp('#e89a6a','#ffd9a0',t));
   ctx.fillStyle=sky; ctx.fillRect(left,skyTop,wWide,GROUND_Y-skyTop);
-  const sun=ctx.createRadialGradient(990,180,10,990,180,160);
-  sun.addColorStop(0,'rgba(255,236,190,.95)');
-  sun.addColorStop(.4,'rgba(255,196,130,.55)');
+  // sun grows warmer/brighter as dawn approaches
+  const sunR=150+30*t, sunY=180-30*t;
+  const sun=ctx.createRadialGradient(990,sunY,10,990,sunY,sunR);
+  sun.addColorStop(0,`rgba(255,240,200,${.9+.05*t})`);
+  sun.addColorStop(.4,`rgba(255,200,135,${.5+.2*t})`);
   sun.addColorStop(1,'rgba(255,170,110,0)');
-  ctx.fillStyle=sun; ctx.beginPath(); ctx.arc(990,180,160,0,7); ctx.fill();
-  ctx.fillStyle='rgba(255,240,210,.95)'; ctx.beginPath(); ctx.arc(990,180,30,0,7); ctx.fill();
+  ctx.fillStyle=sun; ctx.beginPath(); ctx.arc(990,sunY,sunR,0,7); ctx.fill();
+  ctx.fillStyle=`rgba(255,244,215,${.9+.08*t})`; ctx.beginPath(); ctx.arc(990,sunY,30+6*t,0,7); ctx.fill();
   for(const c of parallaxClouds){
     ctx.fillStyle='rgba(255,235,220,.16)';
     cloud(c.x,c.y,c.s);
@@ -953,6 +1052,29 @@ function drawGround(){
   ctx.textAlign='left';
 }
 
+function drawKeeper(){
+  // ATLAS — old lamplighter who works the Star Sling; his lantern keeps a warm light
+  const bx=126, by=GROUND_Y;
+  ctx.save();
+  const flick=1+Math.sin(animT*0.3)*0.08;
+  const lg=ctx.createRadialGradient(bx+20,by-52,2,bx+20,by-52,52*flick);
+  lg.addColorStop(0,'rgba(255,210,130,.55)'); lg.addColorStop(1,'rgba(255,200,120,0)');
+  ctx.fillStyle=lg; ctx.beginPath(); ctx.arc(bx+20,by-52,52*flick,0,7); ctx.fill();
+  // robe
+  ctx.fillStyle='#222c44';
+  ctx.beginPath(); ctx.moveTo(bx-2,by); ctx.quadraticCurveTo(bx-12,by-42,bx+4,by-56);
+  ctx.quadraticCurveTo(bx+16,by-68,bx+28,by-56); ctx.quadraticCurveTo(bx+40,by-38,bx+32,by); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#2c3a58'; ctx.beginPath(); ctx.moveTo(bx+4,by-54); ctx.quadraticCurveTo(bx+16,by-66,bx+28,by-54); ctx.lineTo(bx+24,by-40); ctx.lineTo(bx+8,by-40); ctx.closePath(); ctx.fill();
+  // hood opening + faint eyes
+  ctx.fillStyle='#0e1830'; ctx.beginPath(); ctx.ellipse(bx+16,by-52,7,9,0,0,7); ctx.fill();
+  ctx.fillStyle='rgba(120,220,230,.9)'; ctx.beginPath(); ctx.arc(bx+13,by-52,1.3,0,7); ctx.arc(bx+19,by-52,1.3,0,7); ctx.fill();
+  // arm holding a lantern pole
+  ctx.strokeStyle='#3a2417'; ctx.lineWidth=3; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(bx+30,by-38); ctx.lineTo(bx+22,by-58); ctx.stroke();
+  ctx.fillStyle='#caa15a'; ctx.fillRect(bx+16,by-54,9,12);
+  ctx.fillStyle='#ffe9a8'; ctx.fillRect(bx+18,by-52,5,8);
+  ctx.restore();
+}
 function drawSlingBack(){
   if(state==='aim' && pouchLoaded){
     const px=SLING.x+pull.x, py=SLING.y+pull.y;
@@ -1196,17 +1318,28 @@ function drawCore(c){
   c.pulse+=0.06;
   const pl=0.5+0.5*Math.sin(c.pulse);
   const w=c.w, h=c.h;
-  const gl=ctx.createRadialGradient(0,0,2,0,0,h);
-  gl.addColorStop(0,`rgba(255,93,115,${0.5+pl*0.35})`); gl.addColorStop(1,'rgba(255,93,115,0)');
-  ctx.fillStyle=gl; ctx.beginPath(); ctx.arc(0,0,h*1.05,0,7); ctx.fill();
+  // cold dark aura
+  const gl=ctx.createRadialGradient(0,0,2,0,0,h*1.1);
+  gl.addColorStop(0,`rgba(120,90,200,${0.32+pl*0.22})`); gl.addColorStop(1,'rgba(60,40,110,0)');
+  ctx.fillStyle=gl; ctx.beginPath(); ctx.arc(0,0,h*1.1,0,7); ctx.fill();
+  // dark faceted crystal shell
   ctx.beginPath();
   ctx.moveTo(0,-h/2); ctx.lineTo(w/2,-h*.12); ctx.lineTo(w*.32,h/2);
   ctx.lineTo(-w*.32,h/2); ctx.lineTo(-w/2,-h*.12); ctx.closePath();
   const cg=ctx.createLinearGradient(-w/2,-h/2,w/2,h/2);
-  cg.addColorStop(0,'#ff8a9c'); cg.addColorStop(.5,'#ff5d73'); cg.addColorStop(1,'#c8324a');
+  cg.addColorStop(0,'#3a2f55'); cg.addColorStop(.5,'#241c3c'); cg.addColorStop(1,'#140e26');
   ctx.fillStyle=cg; ctx.fill();
-  ctx.strokeStyle='#ffd1d9'; ctx.lineWidth=1.6; ctx.stroke();
-  ctx.strokeStyle='rgba(255,220,225,.5)'; ctx.lineWidth=1;
+  // trapped light flickering inside (warm — the imprisoned spark)
+  ctx.save(); ctx.clip();
+  const tg=ctx.createRadialGradient(0,h*.05,1,0,0,h*0.7);
+  tg.addColorStop(0,`rgba(255,225,150,${0.55+pl*0.4})`);
+  tg.addColorStop(.5,`rgba(255,150,90,${0.25+pl*0.25})`);
+  tg.addColorStop(1,'rgba(255,120,80,0)');
+  ctx.fillStyle=tg; ctx.beginPath(); ctx.arc(0,h*.05,h*0.7,0,7); ctx.fill();
+  ctx.restore();
+  // cold edges + facet lines
+  ctx.strokeStyle='#7a6bb0'; ctx.lineWidth=1.6; ctx.stroke();
+  ctx.strokeStyle='rgba(180,170,220,.45)'; ctx.lineWidth=1;
   ctx.beginPath(); ctx.moveTo(0,-h/2); ctx.lineTo(0,h/2);
   ctx.moveTo(-w/2,-h*.12); ctx.lineTo(w/2,-h*.12); ctx.stroke();
   ctx.restore();
@@ -1293,6 +1426,7 @@ function render(){
   worldTransform();
   drawSky();
   drawGround();
+  drawKeeper();
   drawSlingBack();
   for(const b of blocks) if(!b.broken) drawBlock(b);
   for(const c of cores) if(!c.dead) drawCore(c);
@@ -1407,8 +1541,8 @@ function sfxLose(){ [400,300,200].forEach((f,i)=>setTimeout(()=>tone(f,.3,'sawto
 const el = id=>document.getElementById(id);
 function updateHUD(){
   const L=levelConfig();
-  el('lvlName').textContent= arena? `ARENA · Dalga ${arenaWave+1}` : L.name;
-  el('lvlSub').textContent= arena? `EN İYİ DALGA ${save.arenaBest+1}` : `SEVİYE ${level+1} / ${LEVELS.length}`;
+  el('lvlName').textContent= arena? `ARENA · Dalga ${arenaWave+1}` : levelStory(level).title;
+  el('lvlSub').textContent= arena? `EN İYİ DALGA ${save.arenaBest+1}` : `BÖLÜM ${level+1} · ${levelStory(level).place}`;
   el('scoreVal').textContent=score.toLocaleString('tr-TR');
   el('coinVal').innerHTML='⬡ <b>'+save.coins.toLocaleString('tr-TR')+'</b>';
   el('rWind').textContent=(L.wind? (L.wind>0?'+':'')+(L.wind*1000).toFixed(1):'0.0');
@@ -1447,7 +1581,7 @@ function computeStars(){
 }
 function showEnd(won){
   const scr=el('endScrim');
-  // arena handles its own flow
+  const used = totalAmmo-ammoLeft();
   let stars = won?computeStars():0;
   let bonus = won? ammoLeft()*150 : 0;
   if(bonus){ score+=bonus; }
@@ -1457,14 +1591,15 @@ function showEnd(won){
     if(!arena){
       save.stars[level]=Math.max(save.stars[level]||0, stars);
       save.best[level]=Math.max(save.best[level]||0, score);
-      save.maxUnlocked=Math.max(save.maxUnlocked, Math.min(level+1, LEVELS.length-1));
+      save.maxUnlocked=Math.max(save.maxUnlocked, level+1); // uncapped → infinite
     }
     save.coins += coinsEarned;
     writeSave();
   }
 
-  el('endEyebrow').textContent=won?'BAŞARILI':'BAŞARISIZ';
-  el('endTitle').textContent= arena? (won?`Dalga ${arenaWave+1} Temiz`:'Arena Bitti') : (won?'Çekirdek İmha':'Mühimmat Bitti');
+  el('endEyebrow').textContent= won? 'IŞIK SERBEST KALDI' : 'NOVA SOLUKLAŞTI';
+  el('endTitle').textContent= arena? (won?`Dalga ${arenaWave+1} Temiz`:'Arena Bitti')
+                                   : (won? levelStory(level).title : 'Son Işık Tükendi');
   el('endScore').textContent=score.toLocaleString('tr-TR');
   el('endScoreSub').textContent = won? `PUAN · +${coinsEarned} ⬡ kazanıldı` : 'PUAN';
   let s='';
@@ -1473,10 +1608,12 @@ function showEnd(won){
 
   if(arena){
     el('endBlurb').textContent = won? 'Dalga temizlendi! Bir sonrakine geç, mühimmat tazelendi.' : `${arenaWave+1}. dalgada düştün. En iyi: ${save.arenaBest+1}. dalga.`;
+  } else if(won){
+    const badge = used<=1 ? '<b style="color:#5be0e6">İLK ATIŞTA!</b> ' : (stars===3 ? '<b style="color:#ffce5a">MÜKEMMEL!</b> ' : '');
+    const cliff = levelStory(level).cliff ? `<br><span class="clue">${levelStory(level).clue}</span><br><i style="color:#9fb4c4">…ama hikâye burada bitmiyor. Yeni bir karanlık yükseliyor.</i>` : `<br><span class="clue">İPUCU: ${levelStory(level).clue}</span>`;
+    el('endBlurb').innerHTML = `${badge}${used} kıvılcımla çözdün · hedef ${levelConfig().par}.${cliff}`;
   } else {
-    el('endBlurb').textContent=won
-      ? `${totalAmmo-ammoLeft()} mühimmat · hedef ${levelConfig().par}${bonus?` · +${bonus} kalan mühimmat bonusu`:''}.`
-      : 'Kalan çekirdek var. Açını, gücünü ve mermi seçimini yeniden hesapla.';
+    el('endBlurb').textContent = 'Karanlık çekirdek hâlâ ayakta. Açını, gücünü ve mermini yeniden hesapla — Nova’yı boşa harcama.';
   }
 
   let btns='';
@@ -1485,9 +1622,7 @@ function showEnd(won){
     btns+=`<button class="cta ghost" data-act="arenaRetry">YENİDEN</button>`;
     btns+=`<button class="cta ghost" data-act="menu">MENÜ</button>`;
   } else {
-    const lastLevel = level>=LEVELS.length-1;
-    if(won && !lastLevel) btns+=`<button class="cta" data-act="next">SONRAKİ BÖLÜM</button>`;
-    if(won && lastLevel)  btns+=`<button class="cta" data-act="menu">BÖLÜMLER</button>`;
+    if(won) btns+=`<button class="cta" data-act="next">SONRAKİ BÖLÜM</button>`;  // campaign is endless
     btns+=`<button class="cta ghost" data-act="retry">TEKRAR</button>`;
     btns+=`<button class="cta ghost" data-act="menu">MENÜ</button>`;
   }
@@ -1495,7 +1630,7 @@ function showEnd(won){
   el('endButtons').querySelectorAll('button').forEach(b=>{
     b.onclick=()=>{ hideEnd(); const a=b.dataset.act;
       if(a==='next') startLevel(level+1);
-      else if(a==='retry') startLevel(level);
+      else if(a==='retry') startLevel(level, true);
       else if(a==='arenaNext'){ arenaWave++; if(arenaWave>save.arenaBest){save.arenaBest=arenaWave; writeSave();} startArenaWave(); }
       else if(a==='arenaRetry'){ arenaWave=0; score=0; startArenaWave(); }
       else openMenu(); };
@@ -1509,13 +1644,25 @@ function win(){ shake=16; slowFactor=0.3; sfxWin(); setTimeout(()=>showEnd(true)
 function lose(){ sfxLose(); setTimeout(()=>showEnd(false), 400); }
 
 /* ---------- flow ---------- */
-function hideAllScrims(){ hideEnd(); el('startScrim').classList.remove('show'); el('lvlScrim').classList.remove('show'); }
-function startLevel(i){
+function hideAllScrims(){ hideEnd(); el('startScrim').classList.remove('show'); el('lvlScrim').classList.remove('show'); el('storyScrim').classList.remove('show'); }
+function showStory(i){
+  const st=levelStory(i);
+  el('storyEyebrow').textContent=`BÖLÜM ${i+1} · ${st.place}`;
+  el('storyTitle').textContent=st.title;
+  let body='';
+  if(i===0) body += STORY.prologue.map(p=>`<p>${p}</p>`).join('');
+  body += `<p class="atlas">${st.intro}</p>`;
+  el('storyBody').innerHTML=body;
+  el('storyGo').onclick=()=>{ el('storyScrim').classList.remove('show'); loadLevel(); updateSolution(null); };
+  el('storyScrim').classList.add('show');
+  state='menu';
+}
+function startLevel(i, skipStory){
   arena=false;
   hideAllScrims();
   level=i; score=0;
-  loadLevel();
-  updateSolution(null);
+  if(skipStory){ loadLevel(); updateSolution(null); }
+  else showStory(i);
 }
 function startArenaWave(){
   arena=true;
@@ -1528,18 +1675,20 @@ function startArena(){ arenaWave=0; score=0; startArenaWave(); }
 function openMenu(){ state='menu'; el('startScrim').classList.add('show'); }
 function openLevels(){
   const grid=el('lvlGrid'); grid.innerHTML='';
-  LEVELS.forEach((L,i)=>{
+  const top=Math.max(LEVELS.length-1, save.maxUnlocked); // show authored + reached endless
+  for(let i=0;i<=top;i++){
     const st=save.stars[i]||0;
     const best=save.best[i]||0;
     const locked = i>save.maxUnlocked;
+    const story=levelStory(i);
     const b=document.createElement('div');
     b.className='lcell'+(locked?' locked':'');
-    b.innerHTML=`<div class="ln">${locked?'🔒 ':''}${i+1}. ${L.name}</div>
+    b.innerHTML=`<div class="ln">${locked?'🔒 ':''}${i+1}. ${story.title}</div>
       <div class="lstars">${'★'.repeat(st)}${'☆'.repeat(3-st)}</div>
       <div class="lbest">${best?best.toLocaleString('tr-TR')+' p':'—'}</div>`;
     if(!locked) b.onclick=()=>{ el('lvlScrim').classList.remove('show'); startLevel(i); };
     grid.appendChild(b);
-  });
+  }
   el('lvlScrim').classList.add('show');
 }
 
@@ -1547,11 +1696,11 @@ el('btnStart').onclick=()=>{ unlockAudio(); startLevel(0); };
 el('btnArena').onclick=()=>{ unlockAudio(); startArena(); };
 el('btnLevels').onclick=openLevels;
 el('btnLvlClose').onclick=()=>{ el('lvlScrim').classList.remove('show'); if(state==='menu') el('startScrim').classList.add('show'); };
-el('btnRestart').onclick=()=>{ hideEnd(); if(arena){ arenaWave=0; score=0; startArenaWave(); } else startLevel(level); };
+el('btnRestart').onclick=()=>{ hideEnd(); if(arena){ arenaWave=0; score=0; startArenaWave(); } else startLevel(level, true); };
 el('btnMenu').onclick=()=>{ hideEnd(); openMenu(); };
 el('btnMute').onclick=()=>{ muted=!muted; el('btnMute').textContent=muted?'🔇':'🔊'; };
 window.addEventListener('keydown',e=>{
-  if(e.key==='r'||e.key==='R'){ if(arena){arenaWave=0;score=0;startArenaWave();} else startLevel(level); }
+  if(e.key==='r'||e.key==='R'){ if(arena){arenaWave=0;score=0;startArenaWave();} else startLevel(level, true); }
   if(e.key==='Escape') openMenu();
   if(e.key==='m'||e.key==='M'){ muted=!muted; el('btnMute').textContent=muted?'🔇':'🔊'; }
   if(e.key===' ' && state==='fly'){ triggerAbility(); }
