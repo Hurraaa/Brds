@@ -590,6 +590,76 @@ const LEVELS = [
     cores:[ {cx:860,cy:g-146,w:40,h:50}, {cx:1000,cy:g-206,w:40,h:50}, {cx:1140,cy:g-146,w:40,h:50} ],
     gems:[ {x:560,y:g-320}, {x:1000,y:g-300} ]
   },
+
+  /* ===================== KUŞAK 3 — CAM RASATHANE (21–30) ===================== */
+  {
+    name:'Cam Avlu', wind:0, par:2, arsenal:{orb:3},
+    hint:'Cam da tek vuruşta kırılır. Camı parçala ya da üzerinden aş.',
+    blocks:[ blk(960,g-55,24,110,'glass') ],
+    cores:[ {cx:1010,cy:g-28,w:42,h:54} ]
+  },
+  {
+    name:'İğne Deliği', wind:0, par:2, arsenal:{orb:3},
+    hint:'İki cam pano arasındaki dar boşluğa dik bir yay at.',
+    blocks:[ blk(930,g-100,24,200,'glass'), blk(1050,g-100,24,200,'glass') ],
+    cores:[ {cx:990,cy:g-28,w:42,h:54} ]
+  },
+  {
+    name:'Üçleme Tatbikatı', wind:0, par:2, arsenal:{split:2, orb:1},
+    hint:'Üçleme dokununca 3’e bölünür — iki kuleyi tek atışta yakala.',
+    blocks:[ blk(880,g-50,24,100,'glass'), blk(1100,g-50,24,100,'glass') ],
+    cores:[ {cx:880,cy:g-126,w:40,h:50}, {cx:1100,cy:g-126,w:40,h:50} ]
+  },
+  {
+    name:'Cam Kafes', wind:0, par:2, arsenal:{orb:3},
+    hint:'Cam kafesi kır — çatıyı ya da yan camı parçala, içindeki ışığı al.',
+    blocks:[ blk(1000,g-12,160,24,'stone'),
+             blk(925,g-80,20,140,'glass'), blk(1075,g-80,20,140,'glass'),
+             blk(1000,g-152,170,20,'glass') ],
+    cores:[ {cx:1000,cy:g-50,w:42,h:54} ]
+  },
+  {
+    name:'Cam Piramidi', wind:0, par:2, arsenal:{orb:3},
+    hint:'Kırılgan cam piramidin tepesindeki çekirdeği düşür.',
+    blocks:[ blk(910,g-23,42,46,'glass'), blk(960,g-23,42,46,'glass'), blk(1010,g-23,42,46,'glass'),
+             blk(935,g-71,42,46,'glass'), blk(985,g-71,42,46,'glass'),
+             blk(960,g-119,42,46,'glass') ],
+    cores:[ {cx:960,cy:g-168,w:40,h:50} ]
+  },
+  {
+    name:'Cam Köprü', wind:0, par:2, arsenal:{orb:3},
+    hint:'İnce cam köprünün üstündeki çekirdeği yay ile yakala.',
+    blocks:[ blk(860,g-70,40,140,'stone'), blk(1140,g-70,40,140,'stone'), blk(1000,g-154,300,22,'glass') ],
+    cores:[ {cx:1000,cy:g-191,w:40,h:50} ],
+    gems:[ {x:560,y:g-260} ]
+  },
+  {
+    name:'Teleskop', wind:0, par:2, arsenal:{orb:4},
+    hint:'Yüksek ve hassas bir atış gerek — teleskopun tepesini vur.',
+    blocks:[ blk(1000,g-50,46,100,'glass'), blk(1000,g-140,30,80,'glass'), blk(1000,g-205,20,50,'glass') ],
+    cores:[ {cx:1000,cy:g-257,w:40,h:50} ]
+  },
+  {
+    name:'Çift Mercek', wind:0, par:3, arsenal:{split:2, orb:2},
+    hint:'İki mercek yan yana. Üçleme ile ikisini birden serbest bırak.',
+    blocks:[ blk(940,g-45,24,90,'glass'), blk(1060,g-45,24,90,'glass') ],
+    cores:[ {cx:940,cy:g-116,w:40,h:50}, {cx:1060,cy:g-116,w:40,h:50} ]
+  },
+  {
+    name:'Kırılgan Kule', wind:0, par:2, arsenal:{orb:4},
+    hint:'Kule çok kırılgan; alta vurursan çöker. Doğrudan tepeyi nişanla.',
+    blocks:[ blk(1000,g-40,36,80,'glass'), blk(1000,g-116,36,80,'glass'),
+             blk(1000,g-192,36,80,'glass'), blk(1000,g-268,36,80,'glass') ],
+    cores:[ {cx:1000,cy:g-334,w:40,h:50} ]
+  },
+  {
+    name:'Büyük Kubbe', wind:0, par:4, arsenal:{orb:4, split:2},
+    hint:'Kubbenin üç ışığını da serbest bırak. Yan yana ikisini üçleme ile al.',
+    blocks:[ blk(880,g-55,40,110,'glass'), blk(1000,g-85,40,170,'glass'), blk(1120,g-55,40,110,'glass'),
+             blk(950,g-25,28,50,'glass'), blk(1050,g-25,28,50,'glass') ],
+    cores:[ {cx:880,cy:g-136,w:40,h:50}, {cx:1000,cy:g-196,w:40,h:50}, {cx:1120,cy:g-136,w:40,h:50} ],
+    gems:[ {x:560,y:g-320}, {x:1000,y:g-310} ]
+  },
 ];
 
 /* ============================================================
@@ -624,7 +694,18 @@ const STORY = {
     {title:'Buz Köprüsü', place:'Donmuş Göl — Köprü', intro:'ATLAS: “Köprünün üstündekini yay ile yakala.”', clue:'İkizler bu köprüde söz vermişti: “asla ayrı kalmayalım.”'},
     {title:'Donmuş Mahzen', place:'Donmuş Göl — Mahzen', intro:'ATLAS: “En parlak anı en derinde saklı. Çatıdaki boşluğu kullan.”', clue:'Sönük en sıcak anıyı buzun en dibine gömmüş.'},
     {title:'Buz ve Taş', place:'Donmuş Göl — Sur', intro:'ATLAS: “İki ışık, bir duvar. Önce duvarı aş, sonra ikisini de al.”', clue:'Buzun altında bir iz: Sönük batıya, cam rasathaneye gitmiş.'},
-    {title:'Buz Sarayı', place:'Donmuş Göl — Saray', intro:'ATLAS: “Sarayın üç ışığını da serbest bırak Nova. Göl seni hatırlayacak.”', clue:'Göl aydınlandı; bir an Lyra’yı yanında gördün sandın. Ama buz çatladı — Sönük çoktan batıya, cama doğru gitmişti.', cliff:true}
+    {title:'Buz Sarayı', place:'Donmuş Göl — Saray', intro:'ATLAS: “Sarayın üç ışığını da serbest bırak Nova. Göl seni hatırlayacak.”', clue:'Göl aydınlandı; bir an Lyra’yı yanında gördün sandın. Ama buz çatladı — Sönük çoktan batıya, cama doğru gitmişti.', cliff:true},
+    /* ----- KUŞAK 3 — CAM RASATHANE ----- */
+    {title:'Cam Avlu', place:'Cam Rasathane — Avlu', intro:'ATLAS: “Burası rasathane. İkizler gökyüzünü buradan izlerdi. Cam da tek vuruşta kırılır.”', clue:'Lyra ile Sönük yıldızlara birlikte isim koyardı.'},
+    {title:'İğne Deliği', place:'Cam Rasathane — Kemer', intro:'ATLAS: “Dar boşluktan içeri arc at. Sönük gökyüzünü herkesten iyi okurdu.”', clue:'Bir gece Sönük teleskopta korkunç bir şey gördü: Lyra düşecekti.'},
+    {title:'Üçleme Tatbikatı', place:'Cam Rasathane — Salon', intro:'ATLAS: “Üçleme ile iki ışığı tek atışta yakala. Hassas ol.”', clue:'O geceyi kimseye söyleyemedi. Kaderi tek başına taşıdı.'},
+    {title:'Cam Kafes', place:'Cam Rasathane — Kafes', intro:'ATLAS: “Kafesi kır, içindeki ışığı al.”', clue:'Lyra düştükten sonra Sönük bütün teleskopları kırdı — bakmaya dayanamadı.'},
+    {title:'Cam Piramidi', place:'Cam Rasathane — Basamaklar', intro:'ATLAS: “Tepedeki ışığı düşür. Kırılgan, dikkatli ol.”', clue:'Her basamak bir yıldızın adı. Çoğunu birlikte koymuşlardı.'},
+    {title:'Cam Köprü', place:'Cam Rasathane — Köprü', intro:'ATLAS: “İnce köprü. Üstündekini yay ile al.”', clue:'Lyra bir kere demişti: “düşersem, ışığımı sana bırakırım.”'},
+    {title:'Teleskop', place:'Cam Rasathane — Büyük Teleskop', intro:'ATLAS: “Yüksek ve hassas bir atış. Sabırlı ol Nova.”', clue:'Sönük o son ışığı taşıyamadı; karanlığın içine sakladı.'},
+    {title:'Çift Mercek', place:'Cam Rasathane — Mercekler', intro:'ATLAS: “İki mercek; üçleme ile ikisi birden.”', clue:'Işık bir camda nasıl ikiye ayrılırsa, ikizler de öyle ayrıldı.'},
+    {title:'Kırılgan Kule', place:'Cam Rasathane — Kule', intro:'ATLAS: “Kule kırılgan; doğrudan tepeyi vur.”', clue:'Sönük’ün izi yukarı, büyük kubbeye çıkıyor.'},
+    {title:'Büyük Kubbe', place:'Cam Rasathane — Kubbe', intro:'ATLAS: “Kubbenin üç ışığını da serbest bırak. Belki o da buradadır.”', clue:'Kubbe aydınlandığında bir mercekte Sönük’ün silüetini gördün — ama döndüğünde yoktu. İz doğuya, barut ovasına gidiyor.', cliff:true}
   ],
   // perpetual deferral — endless episodic content after the authored arc
   endlessTitles:['Yeni Bir Gölge','Çatlayan Ufuk','Soğuk Geçit','Donan Köprü','Kayıp Fener','Uzak Bir Işık','Sönmeyen İz','Yankı'],
