@@ -7,8 +7,27 @@ Gerçek fizik tabanlı, **görsel doyum** ve **karakter (Nova)** üzerine kurulu
 Güneş söndü; geriye sonsuz bir alacakaranlık kaldı. Gökyüzünü bir zamanlar iki ikiz yıldız aydınlatırdı: **Lyra** ve kardeşi **Sönük**. Lyra düşünce Sönük kederinden dondu ve dünyaya, ışığı hapseden **karanlık çekirdekler** ekti. Sen **Nova**’sın — Lyra’nın **son kıvılcımı**. Bekçi **Atlas** asırlık **Yıldız Sapanı**’nı senin için geriyor.
 
 - Her bölüm bir **anı/ipucu** açar; her karanlık çekirdeği kırınca hapsolmuş **ışık serbest kalır**.
-- İlerledikçe gökyüzü **alacakaranlıktan şafağa** döner — ama **tam şafak asla gelmez**: Nova ile Sönük her seferinde tam kavuşacakken araya yeni bir karanlık girer. Bu yüzden oyun **bitmez**; 10 elle yazılmış bölümden sonra **sonsuz, prosedürel** bölümlerle devam eder ve araya yeni hikâye parçaları girer.
+- İlerledikçe gökyüzü **alacakaranlıktan şafağa** döner — ama **tam şafak asla gelmez**: Nova ile Sönük her seferinde tam kavuşacakken araya yeni bir karanlık girer. Bu yüzden oyun **bitmez**; 10 elle yazılmış bölümden sonra **sonsuz** bölümlerle devam eder ve araya yeni hikâye parçaları girer.
 - Nova **son ışık** olduğu için her boşa atış onu soluklaştırır → **hassasiyet** ödüllendirilir (yıldız = az kıvılcımla çöz; "İLK ATIŞTA!" / "MÜKEMMEL").
+
+## 100 Bölüm Planı — 10 Kuşak (×10)
+
+Kampanya 10 kuşağa bölünür; her kuşağın kendi mekânı, malzemesi ve yapı arketipleri vardır. Kuşaklar el yapımına çevrilene dek, bölümler o kuşağın **temasına** ve dönüşümlü **arketiplerine** (kule, kale, köprü, piramit, cep/iğne-deliği, domino, ayrık-hedefler) göre üretilir — böylece yolculuk kuşak kuşak ilerler, asla tek kalıba düşmez.
+
+| # | Kuşak | Tema | Yeni mekanik |
+|---|---|---|---|
+| 1 | Fenerci Kıyısı | Ahşap/Cam | Temeller |
+| 2 | Donmuş Göl | Buz | Kayma |
+| 3 | Cam Rasathane | Cam | İnce nişan / cep |
+| 4 | Barut Ovası | TNT | Zincirleme patlama |
+| 5 | Rüzgârlı Geçit | Rüzgâr | Roket / hareketli hedef |
+| 6 | Soğuk Dökümhane | Metal | Ezme / labirent |
+| 7 | Asılı Bahçeler | Halat/Sarkaç | Sallanan platform |
+| 8 | Gölge Labirenti | Taş/Metal | Sekme atışı / tünel |
+| 9 | Kırık Kale | Karışık | Çoklu çekirdek / sıra |
+| 10 | Sönük'ün Tahtı | Hepsi | Final set-piece'ler |
+
+> Mimari `CHAPTERS` dizisinde tanımlı; her kuşak `mats`, `arch`, `wind`, `tools`, `core` alanlarıyla özelleştirilir. Yapı arketipleri `archTower/archFortress/archBridge/archPyramid/archPocket/archDominoes/archSplit` fonksiyonlarında.
 
 ## Karakter: NOVA
 

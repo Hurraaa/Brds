@@ -564,7 +564,7 @@ function levelStory(i){
   const k = i - STORY.levels.length;
   return {
     title: STORY.endlessTitles[k % STORY.endlessTitles.length],
-    place: STORY.endlessPlaces[k % STORY.endlessPlaces.length],
+    place: chapterOf(i).name,
     intro: STORY.endlessIntros[k % STORY.endlessIntros.length],
     clue:  STORY.endlessClues[k % STORY.endlessClues.length]
   };
@@ -618,47 +618,128 @@ function buildEngine(){
   Composite.add(world, [ground, wallL, wallR]);
 }
 
-/* shared procedural structure generator (arena + endless campaign tail) */
-function genStructure(rng, diff){
-  const rnd=(a,b)=>a+rng()*(b-a);
-  const matsPool = diff<2?['wood','glass']:diff<4?['wood','glass','ice','stone']:['wood','glass','ice','stone','metal','tnt'];
-  const sblocks=[]; const cols = 2 + Math.min(3, Math.floor(diff/2));
-  const baseX = 760, gap = Math.min(150, 480/cols);
-  for(let c=0;c<cols;c++){
-    const x = baseX + c*gap + rnd(-10,10);
-    const stack = 1 + Math.floor(rnd(1, 2.4+diff*0.22));
-    let yTop = g;
-    for(let s=0;s<stack;s++){
-      const mat = matsPool[Math.floor(rng()*matsPool.length)];
-      const hh = mat==='tnt'?56: rnd(60,110);
-      const ww = mat==='tnt'?56: rnd(26,46);
-      yTop -= hh/2;
-      sblocks.push(blk(x, yTop, ww, hh, mat));
-      yTop -= hh/2 + 2;
-    }
+/* ============================================================
+   100-LEVEL PLAN — 10 chapters (×10) of "Son Kıvılcım".
+   Until each chapter is hand-authored, levels are generated from
+   that chapter's THEME + a rotating set of structural archetypes,
+   so the journey reads as chapters and never feels like one mould.
+   ============================================================ */
+const CHAPTERS = [
+  {name:'Fenerci Kıyısı',  mats:['wood','glass'],                       arch:['tower','bridge','split'],        wind:0,      tools:['orb'],                          core:[1,1]},
+  {name:'Donmuş Göl',      mats:['ice','wood','glass'],                 arch:['tower','pyramid','bridge'],      wind:0,      tools:['orb','bomb'],                   core:[1,2]},
+  {name:'Cam Rasathane',   mats:['glass','wood','ice'],                 arch:['pocket','split','tower'],        wind:0,      tools:['orb','split'],                  core:[1,2]},
+  {name:'Barut Ovası',     mats:['tnt','wood','stone'],                 arch:['fortress','dominoes','tower'],   wind:0,      tools:['orb','bomb'],                   core:[1,2]},
+  {name:'Rüzgârlı Geçit',  mats:['wood','stone','glass'],               arch:['bridge','tower','split'],        wind:0.0016, tools:['orb','dash'],                   core:[1,2]},
+  {name:'Soğuk Dökümhane', mats:['metal','stone','glass'],              arch:['fortress','pocket','tower'],     wind:0,      tools:['heavy','bomb','orb'],           core:[1,2]},
+  {name:'Asılı Bahçeler',  mats:['wood','glass','stone'],               arch:['bridge','pyramid','split'],      wind:0.0010, tools:['orb','split','dash'],           core:[2,3]},
+  {name:'Gölge Labirenti', mats:['stone','metal','tnt'],                arch:['pocket','fortress','dominoes'],  wind:0,      tools:['bomb','split','heavy'],         core:[2,3]},
+  {name:'Kırık Kale',      mats:['stone','metal','glass','tnt'],        arch:['fortress','tower','bridge'],     wind:0.0008, tools:['orb','bomb','split','heavy'],   core:[2,3]},
+  {name:'Sönük’ün Tahtı',  mats:['metal','stone','tnt','ice','glass'],  arch:['fortress','pocket','split'],     wind:0.0012, tools:['orb','bomb','split','heavy','dash'], core:[3,4]},
+];
+function chapterOf(i){ return CHAPTERS[Math.min(Math.floor(i/10), CHAPTERS.length-1)]; }
+
+/* ---- structural archetypes (each returns {blocks, cores}) ---- */
+function archTower(c, cc){
+  const {rng,rnd,mat,diff}=c, blocks=[], cores=[];
+  const cols=2+Math.floor(rng()*(2+Math.min(2,Math.floor(diff/8))));
+  const baseX=760, gap=Math.min(150,460/cols);
+  const coreCols=new Set(); while(coreCols.size<Math.min(cc,cols)) coreCols.add(Math.floor(rng()*cols));
+  for(let k=0;k<cols;k++){
+    const x=baseX+k*gap+rnd(-8,8);
+    const stacks=1+Math.floor(rnd(1,2.2+diff*0.12));
+    let yTop=g;
+    for(let s=0;s<stacks;s++){ const m=mat(); const hh=m==='tnt'?56:rnd(58,104), ww=m==='tnt'?56:rnd(26,44);
+      yTop-=hh/2; blocks.push(blk(x,yTop,ww,hh,m)); yTop-=hh/2+2; }
+    if(coreCols.has(k)) cores.push({cx:x, cy:yTop-26, w:40, h:50});
   }
-  const coreCount = 1 + Math.floor(diff/3);
-  const scores=[];
-  for(let i=0;i<coreCount;i++) scores.push({cx: baseX + rnd(0, cols*gap), cy: g - rnd(40, 120), w:40, h:50});
-  const ammoBudget = 3 + Math.floor(diff/2);
-  const ar = {orb: Math.max(1, ammoBudget-2)};
-  if(diff>=1) ar.bomb=1;
-  if(diff>=3) ar.split=1;
-  if(diff>=5) ar.heavy=1;
-  const sgems=[]; const gn=1+Math.floor(diff/2);
-  for(let i=0;i<gn;i++) sgems.push({x:rnd(560,1180), y:g-rnd(180,360)});
-  const totalA = Object.values(ar).reduce((a,b)=>a+b,0);
-  const par = Math.max(coreCount, Math.min(totalA-1, coreCount + Math.floor(diff/3)));
-  return { wind: diff>=2? (rng()*2-1)*0.0014 : 0, arsenal:ar, blocks:sblocks, cores:scores, gems:sgems, par };
+  return {blocks,cores};
 }
-/* campaign: authored levels, then infinite procedural episodes */
+function archFortress(c, cc){
+  const {rng,rnd,ch}=c, blocks=[], cores=[];
+  const cx=950, span=rnd(150,210), h=rnd(150,210);
+  const wall=ch.mats.includes('metal')?'metal':ch.mats.includes('stone')?'stone':'wood';
+  blocks.push(blk(cx-span,g-h/2,44,h,wall), blk(cx+span,g-h/2,44,h,wall));
+  blocks.push(blk(cx,g-h-14,span*2+44,28, ch.mats.includes('stone')?'stone':'wood'));
+  for(let i=0;i<cc;i++){ const t=cc===1?0.5:i/(cc-1); cores.push({cx:cx-span*0.7+span*1.4*t, cy:g-26, w:40, h:50}); }
+  if(rng()<.5) blocks.push(blk(cx,g-h-50,rnd(40,90),24,'glass'));
+  return {blocks,cores};
+}
+function archBridge(c, cc){
+  const {rng,rnd,mat}=c, blocks=[], cores=[];
+  const x1=820, x2=1120, deckY=g-rnd(120,190);
+  blocks.push(blk(x1,(g+deckY)/2,40,g-deckY,'stone'), blk(x2,(g+deckY)/2,40,g-deckY,'stone'));
+  blocks.push(blk((x1+x2)/2, deckY-14, (x2-x1)+60, 26, mat()));
+  for(let i=0;i<cc;i++){ const t=cc===1?0.5:i/(cc-1); cores.push({cx:x1+(x2-x1)*t, cy:deckY-52, w:40, h:50}); }
+  return {blocks,cores};
+}
+function archPyramid(c, cc){
+  const {rng,rnd,mat}=c, blocks=[], cores=[];
+  const cx=960, rows=3+Math.floor(rng()*2), bw=rnd(42,52);
+  for(let r=0;r<rows;r++){ const n=rows-r, y=g-(r+0.5)*(bw+2);
+    for(let k=0;k<n;k++){ const x=cx-(n-1)*bw/2+k*bw; blocks.push(blk(x,y,bw-4,bw,mat())); } }
+  cores.push({cx, cy:g-rows*(bw+2)-26, w:40, h:50});
+  if(cc>1) cores.push({cx:cx-(rows-1)*bw/2-52, cy:g-26, w:40, h:50});
+  return {blocks,cores};
+}
+function archPocket(c, cc){
+  const {rng,rnd,ch}=c, blocks=[], cores=[];
+  const cx=980, innerW=rnd(74,110), h=rnd(120,170), wall=ch.mats.includes('metal')?'metal':'stone';
+  blocks.push(blk(cx,g-12,innerW+90,24,wall));
+  blocks.push(blk(cx-innerW/2-22,g-h/2,44,h,wall), blk(cx+innerW/2+22,g-h/2,44,h,wall));
+  blocks.push(blk(cx+innerW*0.28, g-h-2, innerW*0.74, 22, 'glass')); // roof leaves a left gap to thread
+  cores.push({cx, cy:g-40, w:38, h:48});
+  if(cc>1) cores.push({cx, cy:g-92, w:38, h:48});
+  return {blocks,cores};
+}
+function archDominoes(c, cc){
+  const {rng,rnd,mat}=c, blocks=[], cores=[];
+  const n=4+Math.floor(rng()*3), x0=800, gap=rnd(38,46);
+  for(let i=0;i<n;i++) blocks.push(blk(x0+i*gap, g-60, 16, 120, mat()));
+  const ex=x0+n*gap+30; blocks.push(blk(ex,g-12,72,24,'stone'));
+  cores.push({cx:ex, cy:g-40, w:40, h:50});
+  if(cc>1) cores.push({cx:x0-42, cy:g-26, w:40, h:50});
+  return {blocks,cores};
+}
+function archSplit(c, cc){
+  const {rng,rnd,mat}=c, blocks=[], cores=[];
+  const n=Math.max(2,cc), x0=780, gap=Math.min(150, 420/Math.max(1,n-1));
+  for(let i=0;i<n;i++){ const x=x0+i*gap, h=rnd(50,120);
+    blocks.push(blk(x,g-h/2,30,h,mat())); cores.push({cx:x, cy:g-h-26, w:38, h:48}); }
+  return {blocks,cores};
+}
+const ARCH={tower:archTower,fortress:archFortress,bridge:archBridge,pyramid:archPyramid,pocket:archPocket,dominoes:archDominoes,split:archSplit};
+
+/* themed procedural level for a chapter band */
+function genStructure(rng, band, diff){
+  const ch=CHAPTERS[Math.min(band, CHAPTERS.length-1)];
+  const rnd=(a,b)=>a+rng()*(b-a);
+  const pick=arr=>arr[Math.floor(rng()*arr.length)];
+  const mat=()=>pick(ch.mats);
+  const dloc=Math.min(diff,32);
+  const cc=ch.core[0] + Math.floor(rng()*(ch.core[1]-ch.core[0]+1)) + (diff>50?1:0);
+  const archName=pick(ch.arch);
+  const {blocks,cores}=ARCH[archName]({rng,rnd,pick,mat,ch,diff:dloc}, cc);
+  // arsenal from this chapter's tools
+  const n=cores.length;
+  let budget=n+2+Math.floor(diff/8);
+  const ar={};
+  for(const t of ch.tools){ if(t!=='orb'){ ar[t]=1; budget--; } }
+  ar.orb=Math.max(1, budget);
+  // gems
+  const sgems=[]; const gn=1+Math.floor(rng()*2);
+  for(let i=0;i<gn;i++) sgems.push({x:rnd(560,1180), y:g-rnd(180,360)});
+  const totalA=Object.values(ar).reduce((a,b)=>a+b,0);
+  const par=Math.max(n, Math.min(totalA-1, n+1+Math.floor(diff/14)));
+  const wind=ch.wind? ch.wind*(rng()<.5?1:-1) : 0;
+  return { wind, arsenal:ar, blocks, cores, gems:sgems, par, arch:archName };
+}
+/* campaign: authored levels, then infinite chapter-themed episodes */
 function campaignLevel(i){
   if(i < LEVELS.length) return LEVELS[i];
-  const diff = 4 + (i - LEVELS.length);
-  const s = genStructure(mulberry32(9001 + i*1337), diff);
+  const s = genStructure(mulberry32(9001 + i*1337), Math.floor(i/10), i);
   return { name: levelStory(i).place, wind:s.wind, par:s.par, arsenal:s.arsenal,
     blocks:s.blocks, cores:s.cores, gems:s.gems,
-    hint:'Yeni bir engel araya girdi. Paneli oku, doğru mermiyi seç, çekirdekleri kır.' };
+    hint:`${chapterOf(i).name} — paneli oku, doğru mermiyi seç, çekirdekleri kır.` };
 }
 function levelConfig(){
   return arena ? arenaLevel(arenaWave) : campaignLevel(level);
@@ -724,10 +805,11 @@ function ammoLeft(){ return Object.values(arsenal).reduce((a,b)=>a+b,0); }
    ARENA (endless) generator
    ============================================================ */
 function arenaLevel(wave){
-  const s=genStructure(Math.random, wave);
+  const band=Math.min(Math.floor(wave/3),9);
+  const s=genStructure(Math.random, band, wave+4);
   return { name:'Arena', wind:s.wind, par:99, arsenal:s.arsenal,
     blocks:s.blocks, cores:s.cores, gems:s.gems,
-    hint:`DALGA ${wave+1} · Tüm çekirdekleri kır, dalga ilerlesin. Mühimmat biterse oyun biter.` };
+    hint:`DALGA ${wave+1} · ${CHAPTERS[band].name} · Tüm çekirdekleri kır. Mühimmat biterse oyun biter.` };
 }
 
 /* ============================================================
