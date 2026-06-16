@@ -518,6 +518,78 @@ const LEVELS = [
     cores:[ {cx:900,cy:g-232,w:40,h:50}, {cx:1120,cy:g-232,w:40,h:50}, {cx:1010,cy:g-380,w:40,h:50} ],
     gems:[ {x:520,y:g-260}, {x:1010,y:g-470} ]
   },
+
+  /* ===================== KUŞAK 2 — DONMUŞ GÖL (11–20) ===================== */
+  {
+    name:'İlk Buz', wind:0, par:2, arsenal:{orb:3},
+    hint:'Buz tek vuruşta kırılır. Tepedeki çekirdeği doğrudan vur.',
+    blocks:[ blk(1000,g-50,40,100,'ice') ],
+    cores:[ {cx:1000,cy:g-127,w:42,h:54} ]
+  },
+  {
+    name:'Buz Duvarı', wind:0, par:2, arsenal:{orb:3},
+    hint:'Yüksek buz duvarını yay ile aş, arkasındaki çekirdeği vur.',
+    blocks:[ blk(880,g-70,30,140,'ice'), blk(880,g-170,30,60,'ice') ],
+    cores:[ {cx:1080,cy:g-28,w:42,h:54} ]
+  },
+  {
+    name:'Kayan Zemin', wind:0, par:2, arsenal:{orb:3},
+    hint:'Buz zeminde her şey kayar. Sakin ol, çekirdeği doğrudan nişanla.',
+    blocks:[ blk(1000,g-15,260,30,'ice'), blk(880,g-55,24,50,'ice'), blk(1120,g-55,24,50,'ice') ],
+    cores:[ {cx:1000,cy:g-57,w:42,h:54} ],
+    gems:[ {x:640,y:g-230} ]
+  },
+  {
+    name:'Buz Sütunları', wind:0, par:2, arsenal:{orb:3},
+    hint:'Sütunları kır ya da kirişin üstündeki çekirdeği doğrudan al.',
+    blocks:[ blk(940,g-70,24,140,'ice'), blk(1060,g-70,24,140,'ice'), blk(1000,g-152,170,24,'wood') ],
+    cores:[ {cx:1000,cy:g-190,w:42,h:54} ]
+  },
+  {
+    name:'Bombalı Buz', wind:0, par:2, arsenal:{bomb:2, orb:1},
+    hint:'Çekirdek buz kabuğunun içinde. Bombayı üstüne düşür, patlama kabuğu kırsın.',
+    blocks:[ blk(930,g-60,28,120,'ice'), blk(1090,g-60,28,120,'ice'),
+             blk(1010,g-128,190,24,'ice') ],
+    cores:[ {cx:1010,cy:g-40,w:42,h:54} ]
+  },
+  {
+    name:'Buz Kulesi', wind:0, par:2, arsenal:{orb:4},
+    hint:'Üç katlı buz kulesinin tepesindeki çekirdeği düşür.',
+    blocks:[ blk(1000,g-40,40,80,'ice'), blk(1000,g-118,40,80,'ice'), blk(1000,g-196,40,80,'ice') ],
+    cores:[ {cx:1000,cy:g-262,w:40,h:50} ]
+  },
+  {
+    name:'Buz Köprüsü', wind:0, par:2, arsenal:{orb:3},
+    hint:'Köprünün üstündeki çekirdeği yay ile yakala.',
+    blocks:[ blk(860,g-80,40,160,'stone'), blk(1140,g-80,40,160,'stone'), blk(1000,g-174,320,26,'ice') ],
+    cores:[ {cx:1000,cy:g-213,w:40,h:50} ],
+    gems:[ {x:560,y:g-260} ]
+  },
+  {
+    name:'Donmuş Mahzen', wind:0, par:2, arsenal:{orb:2, bomb:1},
+    hint:'Çatının solunda boşluk var — içeri yay at ya da bombayla aç.',
+    blocks:[ blk(1000,g-12,200,24,'stone'),
+             blk(910,g-85,30,150,'ice'), blk(1090,g-85,30,150,'ice'),
+             blk(1045,g-160,100,22,'ice') ],
+    cores:[ {cx:1000,cy:g-46,w:40,h:50} ]
+  },
+  {
+    name:'Buz ve Taş', wind:0, par:3, arsenal:{orb:3, bomb:1},
+    hint:'İki çekirdek. Önce öndeki taş duvarı yay ile aş.',
+    blocks:[ blk(760,g-70,44,140,'stone'),
+             blk(1000,g-50,30,100,'ice'), blk(1080,g-50,30,100,'ice'),
+             blk(1040,g-118,150,24,'ice') ],
+    cores:[ {cx:920,cy:g-28,w:40,h:50}, {cx:1040,cy:g-40,w:40,h:50} ],
+    gems:[ {x:600,y:g-280} ]
+  },
+  {
+    name:'Buz Sarayı', wind:0, par:4, arsenal:{orb:4, bomb:1, split:1},
+    hint:'Sarayın üç ışığını da serbest bırak. Üçleme ile yan yana ikisini birden yakalayabilirsin.',
+    blocks:[ blk(860,g-60,40,120,'ice'), blk(1000,g-90,40,180,'ice'), blk(1140,g-60,40,120,'ice'),
+             blk(930,g-30,30,60,'ice'), blk(1070,g-30,30,60,'ice') ],
+    cores:[ {cx:860,cy:g-146,w:40,h:50}, {cx:1000,cy:g-206,w:40,h:50}, {cx:1140,cy:g-146,w:40,h:50} ],
+    gems:[ {x:560,y:g-320}, {x:1000,y:g-300} ]
+  },
 ];
 
 /* ============================================================
@@ -541,7 +613,18 @@ const STORY = {
     {title:'Barut Deposu', place:'Eski Cephanelik', intro:'ATLAS: “TNT zinciri… birini ateşle, gerisi kendiliğinden gider.”', clue:'Sönük’ün makineleri ışığı yakıt gibi yakıyor.'},
     {title:'Soğuk Dökümhane', place:'Karanlık Dökümhane', intro:'ATLAS: “Metal kolay kırılmaz. Gülleyle ez ya da çevresini savur.”', clue:'Karanlığın kaynağı burada dövülüyor — bir kalbin etrafında.'},
     {title:'Kale Avlusu', place:'Karanlık Kale — Avlu', intro:'ATLAS: “İki çekirdek, son eşik. Sakin ol, nefesini ayarla.”', clue:'Gerçek şu: Sönük seni söndürmeye değil, korumaya çalışıyordu.'},
-    {title:'Sönük’e Bir Adım', place:'Karanlık Kale — Taht', intro:'ATLAS: “İşte tahtın eşiği. Onu yok etme Nova… içindeki ışığı geri ver.”', clue:'Parmak uçlarınız değecekken karanlık yeniden yükseldi. Henüz değil…', cliff:true}
+    {title:'Sönük’e Bir Adım', place:'Karanlık Kale — Taht', intro:'ATLAS: “İşte tahtın eşiği. Onu yok etme Nova… içindeki ışığı geri ver.”', clue:'Parmak uçlarınız değecekken karanlık yeniden yükseldi. Henüz değil…', cliff:true},
+    /* ----- KUŞAK 2 — DONMUŞ GÖL ----- */
+    {title:'İlk Buz', place:'Donmuş Göl — Kıyı', intro:'ATLAS: “Yolumuz Lyra’nın düştüğü göle çıkıyor. Buz tek vuruşta kırılır — korkma.”', clue:'Bu göl, Lyra düştüğü gece bir anda dondu.'},
+    {title:'Buz Duvarı', place:'Donmuş Göl — Geçit', intro:'ATLAS: “Önündeki perdeyi yay ile aş. Sönük buraya ilk gelendi.”', clue:'Sönük’ün kederi suyu taşa, gölü aynaya çevirdi.'},
+    {title:'Kayan Zemin', place:'Donmuş Göl — Yüzey', intro:'ATLAS: “Buzda her şey kayar; sakin nişan al, sabırlı ol.”', clue:'Bir zamanlar ikizler bu buzun üstünde birlikte kayardı.'},
+    {title:'Buz Sütunları', place:'Donmuş Göl — Sütunlar', intro:'ATLAS: “Sütunları kır ya da tepedekini al. Sen bilirsin.”', clue:'Sönük, Lyra’nın gülüşünü buza hapsetmiş — unutmamak için.'},
+    {title:'Bombalı Buz', place:'Donmuş Göl — Yığın', intro:'ATLAS: “Bu yığın kalın. Bombayı içine sok, sonra patlat.”', clue:'Her hapsolmuş ışık, bir anının soğumuş hâli.'},
+    {title:'Buz Kulesi', place:'Donmuş Göl — Kule', intro:'ATLAS: “Tepedeki ışığı indir. Yavaş, ama emin ol.”', clue:'Kule, Lyra’nın son durduğu yer. Sönük onu öylece dondurmuş.'},
+    {title:'Buz Köprüsü', place:'Donmuş Göl — Köprü', intro:'ATLAS: “Köprünün üstündekini yay ile yakala.”', clue:'İkizler bu köprüde söz vermişti: “asla ayrı kalmayalım.”'},
+    {title:'Donmuş Mahzen', place:'Donmuş Göl — Mahzen', intro:'ATLAS: “En parlak anı en derinde saklı. Çatıdaki boşluğu kullan.”', clue:'Sönük en sıcak anıyı buzun en dibine gömmüş.'},
+    {title:'Buz ve Taş', place:'Donmuş Göl — Sur', intro:'ATLAS: “İki ışık, bir duvar. Önce duvarı aş, sonra ikisini de al.”', clue:'Buzun altında bir iz: Sönük batıya, cam rasathaneye gitmiş.'},
+    {title:'Buz Sarayı', place:'Donmuş Göl — Saray', intro:'ATLAS: “Sarayın üç ışığını da serbest bırak Nova. Göl seni hatırlayacak.”', clue:'Göl aydınlandı; bir an Lyra’yı yanında gördün sandın. Ama buz çatladı — Sönük çoktan batıya, cama doğru gitmişti.', cliff:true}
   ],
   // perpetual deferral — endless episodic content after the authored arc
   endlessTitles:['Yeni Bir Gölge','Çatlayan Ufuk','Soğuk Geçit','Donan Köprü','Kayıp Fener','Uzak Bir Işık','Sönmeyen İz','Yankı'],
